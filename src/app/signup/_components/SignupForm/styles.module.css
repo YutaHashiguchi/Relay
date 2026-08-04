@@ -1,0 +1,41 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.errorMessage,
+.successMessage {
+  padding: 12px 16px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  border-radius: 4px;
+}
+
+.errorMessage {
+  color: #842f26;
+  background-color: #f7e4df;
+  border: 1px solid #d8aaa1;
+}
+
+.successMessage {
+  color: #3c6042;
+  background-color: #e7efdf;
+  border: 1px solid #afc3a6;
+}
+
+.loginGuide {
+  margin: 10px 0;
+  color: #756557;
+  font-size: 14px;
+  text-align: center;
+}
+
+.loginGuide a {
+  margin-left: 8px;
+  color: #754230;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

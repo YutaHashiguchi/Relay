@@ -1,0 +1,53 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.errorMessage {
+  padding: 12px 16px;
+  margin: 0;
+  color: #842f26;
+  font-size: 14px;
+  line-height: 1.6;
+  background-color: #f7e4df;
+  border: 1px solid #d8aaa1;
+  border-radius: 4px;
+}
+
+.signupGuide {
+  margin: 0;
+  color: #756557;
+  font-family:
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    "Hiragino Mincho Pro",
+    serif;
+  font-size: 14px;
+  line-height: 1.7;
+  text-align: center;
+}
+
+.signupGuide a {
+  display: inline-block;
+  margin-left: 8px;
+  color: #754230;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-color: rgb(117 66 48 / 45%);
+  text-underline-offset: 4px;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+
+.signupGuide a:hover {
+  color: #4f2c20;
+  text-decoration-color: #4f2c20;
+}
+
+.signupGuide a:focus-visible {
+  border-radius: 2px;
+  outline: 2px solid #b99a69;
+  outline-offset: 4px;
+}
