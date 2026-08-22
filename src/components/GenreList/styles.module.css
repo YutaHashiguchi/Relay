@@ -1,0 +1,63 @@
+.genreList {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.genreItem {
+  display: flex;
+  min-height: 72px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  color: #5b4638;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  background-color: #f3ead7;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgb(96 76 48 / 2%) 0,
+    rgb(96 76 48 / 2%) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+  border: 1px solid #cbb899;
+  border-radius: 3px;
+  box-shadow:
+    0 4px 10px rgb(73 50 31 / 8%),
+    inset 0 0 12px rgb(119 91 48 / 4%);
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.genreItem:hover {
+  color: #3f2a20;
+  background-color: #eadcc2;
+  box-shadow:
+    0 7px 16px rgb(73 50 31 / 13%),
+    inset 0 0 12px rgb(119 91 48 / 4%);
+  transform: translateY(-2px);
+}
+
+.ornament {
+  color: #ad8d68;
+  font-size: 8px;
+}
+
+@media (max-width: 760px) {
+  .genreList {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 420px) {
+  .genreList {
+    grid-template-columns: 1fr;
+  }
+}

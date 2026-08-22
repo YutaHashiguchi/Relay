@@ -1,0 +1,66 @@
+.wrapper {
+  width: 100%;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  color: #493a2f;
+  font-family:
+    "Yu Mincho",
+    "Hiragino Mincho ProN",
+    serif;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.selectWrapper {
+  position: relative;
+}
+
+.selectWrapper::after {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  content: "▼";
+  color: #80654f;
+  font-size: 10px;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+
+.select {
+  width: 100%;
+  padding: 13px 44px 13px 16px;
+  color: #342b24;
+  font-size: 15px;
+  appearance: none;
+  cursor: pointer;
+  background-color: rgb(255 253 246 / 72%);
+  border: 1px solid #cbb99b;
+  border-radius: 4px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.select:focus {
+  border-color: #8f674a;
+  box-shadow: 0 0 0 3px rgb(185 154 105 / 18%);
+}
+
+.select:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.errorSelect {
+  border-color: #a84335;
+}
+
+.errorMessage {
+  margin: 6px 0 0;
+  color: #983c31;
+  font-size: 13px;
+}

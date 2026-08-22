@@ -1,0 +1,183 @@
+.main {
+  min-height: 100vh;
+  padding: 40px 20px 80px;
+  color: #382f26;
+  background-color: #d8c7a8;
+}
+
+.container {
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto;
+}
+
+.navigation {
+  margin-bottom: 20px;
+}
+
+.navigation a {
+  color: #6f5c4c;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.paper {
+  padding: 56px 70px;
+  background-color: #f8f1df;
+  border: 1px solid #d2c09f;
+  border-radius: 4px;
+  box-shadow:
+    0 20px 50px rgb(63 43 24 / 18%),
+    inset 0 0 28px rgb(119 91 48 / 4%);
+}
+
+.header {
+  text-align: center;
+}
+
+.genre {
+  margin: 0;
+  color: #967758;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+}
+
+.title {
+  margin: 18px 0 0;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.author {
+  margin: 14px 0 0;
+  color: #847566;
+  font-size: 13px;
+}
+
+.synopsis {
+  max-width: 600px;
+  margin: 28px auto 0;
+  color: #706357;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 14px;
+  line-height: 2;
+  text-align: left;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 34px 0;
+  color: #a58b6b;
+  font-size: 8px;
+}
+
+.divider::before,
+.divider::after {
+  flex: 1;
+  height: 1px;
+  content: "";
+  background: linear-gradient(to right, transparent, #c7b493, transparent);
+}
+
+.posts {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.post {
+  padding-bottom: 36px;
+  border-bottom: 1px solid rgb(165 139 107 / 30%);
+}
+
+.postHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  color: #907c68;
+  font-size: 12px;
+}
+
+.body {
+  margin: 0;
+  color: #382f26;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 16px;
+  line-height: 2.2;
+  white-space: pre-wrap;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 44px;
+}
+
+.continueButton {
+  min-width: 260px;
+  padding: 14px 24px;
+  color: #fff8e8;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  text-align: center;
+  text-decoration: none;
+  background-color: #754230;
+  border: 1px solid #8f674a;
+  border-radius: 3px;
+}
+
+.continueButton:hover {
+  background-color: #543023;
+}
+
+.editLink {
+  display: inline-block;
+  margin-top: 12px;
+  color: #754230;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.editLink:hover {
+  color: #543023;
+}
+
+.postMeta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.postEditLink {
+  color: #754230;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.postEditLink:hover {
+  color: #543023;
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding: 24px 14px 50px;
+  }
+
+  .paper {
+    padding: 40px 24px;
+  }
+
+  .title {
+    font-size: 25px;
+  }
+
+  .body {
+    font-size: 15px;
+  }
+}

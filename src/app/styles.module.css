@@ -1,0 +1,219 @@
+.main {
+  min-height: 100vh;
+  color: #3a3028;
+  background-color: #d8c7a8;
+  background-image:
+    radial-gradient(
+      circle at 15% 10%,
+      rgb(255 250 234 / 72%) 0,
+      transparent 34%
+    ),
+    radial-gradient(circle at 85% 80%, rgb(126 91 52 / 10%) 0, transparent 40%),
+    repeating-linear-gradient(
+      0deg,
+      rgb(91 70 43 / 2%) 0,
+      rgb(91 70 43 / 2%) 1px,
+      transparent 1px,
+      transparent 5px
+    );
+}
+
+.hero {
+  display: flex;
+  min-height: 440px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 20px;
+  text-align: center;
+}
+
+.heroEyebrow {
+  margin: 0;
+  color: #8e7156;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 11px;
+  letter-spacing: 0.28em;
+}
+
+.heroLogo {
+  margin: 18px 0 0;
+  color: #563629;
+  font-size: 92px;
+  font-weight: 700;
+  line-height: 0.8;
+}
+
+.heroTitle {
+  margin: 30px 0 0;
+  color: #382b23;
+  font-family:
+    "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", serif;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.heroDescription {
+  margin: 18px 0 0;
+  color: #6d5d4f;
+  font-family:
+    "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", serif;
+  font-size: 15px;
+  line-height: 2;
+  letter-spacing: 0.08em;
+}
+
+.heroButton {
+  display: inline-block;
+  min-width: 180px;
+  padding: 13px 26px;
+  margin-top: 30px;
+  color: #fff8e8;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-decoration: none;
+  background-color: #754230;
+  border: 1px solid #8f674a;
+  border-radius: 3px;
+  box-shadow:
+    0 4px 10px rgb(66 43 29 / 18%),
+    inset 0 1px 0 rgb(255 255 255 / 10%);
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.heroButton:hover {
+  background-color: #543023;
+  box-shadow:
+    0 6px 14px rgb(66 43 29 / 24%),
+    inset 0 1px 0 rgb(255 255 255 / 10%);
+  transform: translateY(-1px);
+}
+
+.content {
+  width: 100%;
+  max-width: 1120px;
+  padding: 0 24px 80px;
+  margin: 0 auto;
+}
+
+.section {
+  margin-top: 72px;
+}
+
+.section:first-child {
+  margin-top: 0;
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 30px;
+}
+
+.sectionHeading span {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #a98b66, transparent);
+}
+
+.sectionHeading h2 {
+  margin: 0;
+  color: #49372d;
+  font-family:
+    "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", serif;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.storyGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.more {
+  margin-top: 24px;
+  text-align: right;
+}
+
+.more a {
+  color: #6f4b38;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.more a:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+@media (max-width: 900px) {
+  .storyGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero {
+    min-height: 400px;
+  }
+
+  .heroLogo {
+    font-size: 80px;
+  }
+
+  .heroTitle {
+    font-size: 26px;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    min-height: auto;
+    padding: 54px 16px;
+  }
+
+  .heroLogo {
+    font-size: 70px;
+  }
+
+  .heroTitle {
+    font-size: 22px;
+    line-height: 1.7;
+  }
+
+  .heroDescription {
+    font-size: 14px;
+  }
+
+  .content {
+    padding: 0 16px 56px;
+  }
+
+  .section {
+    margin-top: 54px;
+  }
+
+  .sectionHeading {
+    gap: 12px;
+  }
+
+  .sectionHeading h2 {
+    font-size: 17px;
+  }
+
+  .storyGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .more {
+    text-align: center;
+  }
+}

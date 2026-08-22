@@ -92,11 +92,10 @@ export default function LoginForm() {
         ログイン
       </SubmitButton>
 
-      <p className={styles.signupGuide}>
+      <p className={styles.registerGuide}>
         アカウントをお持ちでない方
-        <Link href="/signup">新規登録</Link>
+        <Link href="/register">新規登録</Link>
       </p>
     </form>
   );
 }
-  

@@ -1,0 +1,149 @@
+.header {
+  width: 100%;
+  background-color: #efe2c5;
+  border-bottom: 1px solid rgb(117 88 61 / 20%);
+  backdrop-filter: blur(8px);
+}
+
+.inner {
+  display: flex;
+  width: 100%;
+  max-width: 1120px;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  padding: 0 24px;
+  margin: 0 auto;
+}
+
+.logo {
+  flex-shrink: 0;
+  color: #543326;
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.navigation {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.navLink,
+.loginLink {
+  position: relative;
+  color: #65564a;
+  font-family:
+    "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", serif;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.navLink::after,
+.loginLink::after {
+  position: absolute;
+  right: 0;
+  bottom: -6px;
+  left: 0;
+  height: 1px;
+  content: "";
+  background-color: #754230;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.navLink:hover,
+.loginLink:hover {
+  color: #43291f;
+}
+
+.navLink:hover::after,
+.loginLink:hover::after {
+  transform: scaleX(1);
+}
+
+.authArea {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-left: 26px;
+  border-left: 1px solid rgb(117 88 61 / 25%);
+}
+
+.registerLink {
+  padding: 9px 18px;
+  color: #fff8e8;
+  font-family:
+    "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", serif;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  background-color: #754230;
+  border: 1px solid #8f674a;
+  border-radius: 3px;
+  box-shadow: 0 2px 5px rgb(68 42 29 / 15%);
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.registerLink:hover {
+  background-color: #543023;
+  transform: translateY(-1px);
+}
+
+@media (max-width: 760px) {
+  .inner {
+    min-height: 68px;
+    padding: 0 16px;
+  }
+
+  .logo {
+    font-size: 44px;
+  }
+
+  .navigation {
+    gap: 14px;
+  }
+
+  .navLink {
+    display: none;
+  }
+
+  .authArea {
+    gap: 12px;
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .loginLink {
+    font-size: 13px;
+  }
+
+  .registerLink {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+}
+.logoutButton {
+  padding: 0;
+  color: #65564a;
+  font-family:
+    "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", serif;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  background: none;
+  border: none;
+  transition: color 0.2s ease;
+}
+
+.logoutButton:hover {
+  color: #43291f;
+}

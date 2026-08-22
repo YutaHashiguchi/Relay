@@ -1,0 +1,123 @@
+.card {
+  position: relative;
+  padding: 24px;
+  overflow: hidden;
+  background-color: #f8f1df;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgb(96 76 48 / 2%) 0,
+    rgb(96 76 48 / 2%) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+  border: 1px solid #cdbb9c;
+  border-radius: 4px;
+  box-shadow:
+    0 8px 20px rgb(73 50 31 / 12%),
+    inset 0 0 18px rgb(119 91 48 / 4%);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 14px 30px rgb(73 50 31 / 17%),
+    inset 0 0 18px rgb(119 91 48 / 4%);
+}
+
+.card::before {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 14px;
+  width: 1px;
+  content: "";
+  background-color: rgb(126 97 57 / 18%);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.genre {
+  padding: 4px 9px;
+  color: #755743;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  background-color: #eadcc2;
+  border: 1px solid #ccb795;
+  border-radius: 2px;
+}
+
+.latestPost {
+  color: #9a8b7a;
+  font-size: 11px;
+}
+
+.title {
+  margin: 0;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.title a {
+  color: #382d25;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.title a:hover {
+  color: #754230;
+}
+
+.synopsis {
+  display: -webkit-box;
+  margin: 12px 0 0;
+  overflow: hidden;
+  color: #706357;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 13px;
+  line-height: 1.9;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.divider {
+  height: 1px;
+  margin: 20px 0 14px;
+  background: linear-gradient(to right, transparent, #c8b28d, transparent);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.author {
+  color: #827260;
+  font-size: 12px;
+}
+
+.detailLink {
+  color: #754230;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.detailLink:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

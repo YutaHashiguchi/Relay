@@ -1,0 +1,67 @@
+.main {
+  min-height: 100vh;
+  padding: 40px 20px 80px;
+  color: #382f26;
+  background-color: #d8c7a8;
+}
+
+.container {
+  width: 100%;
+  max-width: 720px;
+  padding: 50px 60px 60px;
+  margin: 0 auto;
+
+  background-color: #f8f1df;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgb(96 76 48 / 2%) 0,
+    rgb(96 76 48 / 2%) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+
+  border: 1px solid #d2c09f;
+  border-radius: 4px;
+
+  box-shadow:
+    0 20px 50px rgb(63 43 24 / 18%),
+    inset 0 0 28px rgb(119 91 48 / 4%);
+}
+
+.title {
+  margin: 0;
+  color: #382f26;
+
+  font-family:
+    "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", serif;
+
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+.navigation {
+  margin-bottom: 20px;
+}
+
+.navigation a {
+  color: #6f5c4c;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+@media (max-width: 640px) {
+  .main {
+    padding: 24px 14px 50px;
+  }
+
+  .container {
+    padding: 36px 24px 44px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+}

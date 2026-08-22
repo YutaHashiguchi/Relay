@@ -15,20 +15,17 @@
   border-radius: 4px;
 }
 
-.signupGuide {
+.registerGuide {
   margin: 0;
   color: #756557;
   font-family:
-    "Yu Mincho",
-    "Hiragino Mincho ProN",
-    "Hiragino Mincho Pro",
-    serif;
+    "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", serif;
   font-size: 14px;
   line-height: 1.7;
   text-align: center;
 }
 
-.signupGuide a {
+.registerGuide a {
   display: inline-block;
   margin-left: 8px;
   color: #754230;
@@ -41,12 +38,12 @@
     text-decoration-color 0.2s ease;
 }
 
-.signupGuide a:hover {
+.registerGuide a:hover {
   color: #4f2c20;
   text-decoration-color: #4f2c20;
 }
 
-.signupGuide a:focus-visible {
+.registerGuide a:focus-visible {
   border-radius: 2px;
   outline: 2px solid #b99a69;
   outline-offset: 4px;

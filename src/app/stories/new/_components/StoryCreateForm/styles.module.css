@@ -1,0 +1,33 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  margin-top: 34px;
+}
+
+.errorMessage,
+.successMessage {
+  padding: 13px 16px;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.7;
+  border-radius: 4px;
+}
+
+.errorMessage {
+  color: #842f26;
+  background-color: #f7e4df;
+  border: 1px solid #d8aaa1;
+}
+
+.successMessage {
+  color: #3c6042;
+  background-color: #e7efdf;
+  border: 1px solid #afc3a6;
+}
+
+.actions {
+  max-width: 320px;
+  margin: 8px auto 0;
+  width: 100%;
+}

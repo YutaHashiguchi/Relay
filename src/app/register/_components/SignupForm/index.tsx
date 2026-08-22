@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import type { FormEvent } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -13,7 +13,6 @@ import styles from "./styles.module.css";
 
 export default function SignupForm() {
   const router = useRouter();
-  const supabase = createClient();
 
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
@@ -38,6 +37,11 @@ export default function SignupForm() {
       return;
     }
 
+    if (!trimmedEmail) {
+      setErrorMessage("メールアドレスを入力してください。");
+      return;
+    }
+
     if (password.length < 8) {
       setErrorMessage("パスワードは8文字以上で入力してください。");
       return;
@@ -51,6 +55,8 @@ export default function SignupForm() {
     setIsLoading(true);
 
     try {
+      const supabase = createClient();
+
       const { data, error } = await supabase.auth.signUp({
         email: trimmedEmail,
         password,
@@ -62,27 +68,33 @@ export default function SignupForm() {
       });
 
       if (error) {
-        console.error(error);
+        console.error("Signup error:", error);
 
-        setErrorMessage("新規登録に失敗しました。入力内容をご確認ください。");
+        setErrorMessage("新規登録に失敗しました。");
+
         return;
       }
 
+      console.log("Signup data:", data);
+
+      // メール認証なしの場合
       if (data.session) {
-        router.replace("/");
+        router.push("/");
         router.refresh();
         return;
       }
 
+      // メール認証ありの場合
       setSuccessMessage(
-        "確認メールを送信しました。メール内のリンクを開いてください。",
+        "確認メールを送信しました。メール内のリンクから登録を完了してください。",
       );
-    } catch (error) {
-      console.error(error);
 
-      setErrorMessage(
-        "通信に失敗しました。時間を置いてもう一度お試しください。",
-      );
+      setPassword("");
+      setPasswordConfirmation("");
+    } catch (error) {
+      console.error("Signup error:", error);
+
+      setErrorMessage("通信に失敗しました。もう一度お試しください。");
     } finally {
       setIsLoading(false);
     }
@@ -98,7 +110,6 @@ export default function SignupForm() {
         value={displayName}
         onChange={(event) => setDisplayName(event.target.value)}
         placeholder="表示名を入力"
-        autoComplete="nickname"
         maxLength={30}
         disabled={isLoading}
         required
