@@ -56,6 +56,25 @@ export default async function StoryDetailPage({
     data: { user },
   } = await supabase.auth.getUser();
 
+  // 現在の執筆ロックを取得
+  const { data: writingLock } = await supabase
+    .from("story_writing_locks")
+    .select(
+      `
+    user_id,
+    expires_at
+  `,
+    )
+    .eq("story_id", story.id)
+    .maybeSingle();
+
+  const isActiveLock =
+    writingLock && new Date(writingLock.expires_at).getTime() > Date.now();
+
+  const isMyLock = isActiveLock && user?.id === writingLock.user_id;
+
+  const isLockedByOther = isActiveLock && user?.id !== writingLock.user_id;
+
   const isOwner = user?.id === story.author_id;
 
   const posts = [...story.posts].sort((a, b) => a.position - b.position);
@@ -117,14 +136,25 @@ export default async function StoryDetailPage({
               </section>
             ))}
           </div>
-
           <div className={styles.actions}>
-            <Link
-              href={`/stories/${story.id}/posts/new`}
-              className={styles.continueButton}
-            >
-              この物語の続きを書く
-            </Link>
+            {isLockedByOther ? (
+              <div className={styles.lockedArea}>
+                <span className={styles.disabledContinueButton}>
+                  現在執筆中
+                </span>
+
+                <p className={styles.lockMessage}>
+                  現在、ほかのユーザーが続きを執筆しています。
+                </p>
+              </div>
+            ) : (
+              <Link
+                href={`/stories/${story.id}/posts/new`}
+                className={styles.continueButton}
+              >
+                {isMyLock ? "執筆を続ける" : "この物語の続きを書く"}
+              </Link>
+            )}
           </div>
         </article>
       </div>

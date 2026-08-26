@@ -164,6 +164,41 @@
   color: #543023;
 }
 
+.lockedArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.disabledContinueButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 220px;
+  padding: 14px 28px;
+
+  color: #f4eee4;
+  font-size: 15px;
+
+  background-color: #a89b8d;
+  border-radius: 4px;
+
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.lockMessage {
+  margin: 0;
+
+  color: #8a7d6d;
+  font-family:
+    "Yu Mincho", "Hiragino Mincho ProN", "Hiragino Mincho Pro", serif;
+
+  font-size: 13px;
+  text-align: center;
+}
+
 @media (max-width: 640px) {
   .main {
     padding: 24px 14px 50px;
