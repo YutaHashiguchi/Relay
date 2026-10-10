@@ -5,6 +5,24 @@ import { createClient } from "@/lib/supabase/server";
 
 import styles from "./styles.module.css";
 
+type StoryDetail = {
+  id: string;
+  author_id: string;
+  title: string;
+  synopsis: string | null;
+  created_at: string;
+  genre: { name: string } | null;
+  author: { display_name: string } | null;
+  posts: {
+    id: string;
+    author_id: string;
+    body: string;
+    position: number;
+    created_at: string;
+    author: { display_name: string } | null;
+  }[];
+};
+
 type StoryDetailPageProps = {
   params: Promise<{
     storyId: string;
@@ -46,7 +64,8 @@ export default async function StoryDetailPage({
     `,
     )
     .eq("id", storyId)
-    .single();
+    .single()
+    .overrideTypes<StoryDetail>();
 
   if (error || !story) {
     notFound();

@@ -7,6 +7,13 @@ import PostCreateForm from "./_components/PostCreateForm";
 import baseStyles from "../../../new/styles.module.css";
 import styles from "./styles.module.css";
 
+type LatestPost = {
+  id: string;
+  body: string;
+  position: number;
+  author: { display_name: string } | null;
+};
+
 type PostCreatePageProps = {
   params: Promise<{
     storyId: string;
@@ -61,7 +68,8 @@ export default async function PostCreatePage({ params }: PostCreatePageProps) {
       ascending: false,
     })
     .limit(1)
-    .single();
+    .single()
+    .overrideTypes<LatestPost>();
 
   if (postError || !latestPost) {
     notFound();

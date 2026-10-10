@@ -3,6 +3,7 @@ import { Tangerine } from "next/font/google";
 
 import GenreList from "@/components/GenreList";
 import StoryCard from "@/components/StoryCard";
+import { createClient } from "@/lib/supabase/server";
 
 import styles from "./styles.module.css";
 
@@ -12,61 +13,140 @@ const tangerine = Tangerine({
   display: "swap",
 });
 
-const newStories = [
-  {
-    id: "1",
-    title: "月のない夜",
-    synopsis: "月が消えた夜、この街では誰も空を見上げなくなった。",
-    genre: "ミステリー",
-    authorName: "テストユーザー",
-    latestPost: "2分前",
-  },
-  {
-    id: "2",
-    title: "最後の夏休み",
-    synopsis: "高校最後の夏、僕たちは誰にも言えない秘密を見つけた。",
-    genre: "青春",
-    authorName: "小説好き",
-    latestPost: "15分前",
-  },
-  {
-    id: "3",
-    title: "100年後の東京",
-    synopsis: "西暦2126年。東京から人間の姿が消えていた。",
-    genre: "SF",
-    authorName: "Relay Writer",
-    latestPost: "30分前",
-  },
-];
+type StoryRow = {
+  id: string;
+  title: string;
+  synopsis: string | null;
+  created_at: string;
 
-const popularStories = [
-  {
-    id: "4",
-    title: "そして扉は開かれた",
-    synopsis: "祖父から受け継いだ鍵が開けたのは、存在しないはずの部屋だった。",
-    genre: "ファンタジー",
-    authorName: "Story Maker",
-    latestPost: "1時間前",
-  },
-  {
-    id: "5",
-    title: "明日、君を忘れる",
-    synopsis: "毎朝、彼女は僕のことだけを忘れてしまう。",
-    genre: "恋愛",
-    authorName: "しおり",
-    latestPost: "2時間前",
-  },
-  {
-    id: "6",
-    title: "午前零時の喫茶店",
-    synopsis: "その店は、人生に迷った人の前にだけ現れる。",
-    genre: "日常",
-    authorName: "珈琲",
-    latestPost: "3時間前",
-  },
-];
+  author: {
+    display_name: string;
+  } | null;
 
-export default function HomePage() {
+  genre: {
+    name: string;
+  } | null;
+
+  posts: {
+    id: string;
+    position: number;
+    created_at: string;
+  }[];
+};
+
+function formatRelativeTime(dateString: string) {
+  const createdAt = new Date(dateString);
+  const now = new Date();
+
+  const diffMs = now.getTime() - createdAt.getTime();
+
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffMinutes < 1) {
+    return "たった今";
+  }
+
+  if (diffMinutes < 60) {
+    return `${diffMinutes}分前`;
+  }
+
+  if (diffHours < 24) {
+    return `${diffHours}時間前`;
+  }
+
+  if (diffDays < 7) {
+    return `${diffDays}日前`;
+  }
+
+  return createdAt.toLocaleDateString("ja-JP");
+}
+
+export default async function HomePage() {
+  const supabase = await createClient();
+
+  const { data: storiesData, error } = await supabase
+    .from("stories")
+    .select(
+      `
+      id,
+      title,
+      synopsis,
+      created_at,
+      author:profiles (
+        display_name
+      ),
+      genre:genres (
+        name
+      ),
+      posts (
+        id,
+        position,
+        created_at
+      )
+    `,
+    )
+    .order("created_at", {
+      ascending: false,
+    });
+
+  if (error) {
+    console.error("Stories fetch error:", error);
+  }
+
+  const allStories = (storiesData ?? []) as unknown as StoryRow[];
+
+  // 新着順で3作品
+  const newStories = allStories.slice(0, 3).map((story) => {
+    const latestPost = [...story.posts].sort(
+      (a, b) => b.position - a.position,
+    )[0];
+
+    return {
+      id: story.id,
+      title: story.title,
+      synopsis: story.synopsis ?? "",
+      genre: story.genre?.name ?? "その他",
+      authorName: story.author?.display_name ?? "名前未設定",
+      latestPost: latestPost
+        ? formatRelativeTime(latestPost.created_at)
+        : formatRelativeTime(story.created_at),
+    };
+  });
+
+  // Post数が多い順で3作品
+  const popularStories = [...allStories]
+    .sort((a, b) => {
+      if (b.posts.length !== a.posts.length) {
+        return b.posts.length - a.posts.length;
+      }
+
+      // Post数が同じなら新しい作品を上にする
+      return (
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+    })
+    .slice(0, 3)
+    .map((story) => {
+      const latestPost = [...story.posts].sort(
+        (a, b) => b.position - a.position,
+      )[0];
+
+      return {
+        id: story.id,
+        title: story.title,
+        synopsis: story.synopsis ?? "",
+        genre: story.genre?.name ?? "その他",
+        authorName: story.author?.display_name ?? "名前未設定",
+        latestPost: latestPost
+          ? formatRelativeTime(latestPost.created_at)
+          : formatRelativeTime(story.created_at),
+      };
+    });
+
   return (
     <main className={styles.main}>
       <section className={styles.hero}>
