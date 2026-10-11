@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import styles from "./styles.module.css";
+import StorySummary from "./_components/StorySummary";
 
 type StoryDetail = {
   id: string;
@@ -129,6 +130,7 @@ export default async function StoryDetailPage({
             <div className={styles.divider}>
               <span>◆</span>
             </div>
+            <StorySummary storyId={story.id} isLoggedIn={Boolean(user)} />
           </header>
 
           <div className={styles.posts}>
