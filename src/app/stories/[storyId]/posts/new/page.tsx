@@ -4,21 +4,22 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import PostCreateForm from "./_components/PostCreateForm";
+import type { PostCreatePageProps } from "./type";
+
 import baseStyles from "../../../new/styles.module.css";
 import styles from "./styles.module.css";
-
-type PostCreatePageProps = {
-  params: Promise<{
-    storyId: string;
-  }>;
-};
 
 export default async function PostCreatePage({ params }: PostCreatePageProps) {
   const { storyId } = await params;
 
+  const storyIdNumber = Number(storyId);
+
+  if (!Number.isInteger(storyIdNumber) || storyIdNumber <= 0) {
+    notFound();
+  }
+
   const supabase = await createClient();
 
-  // ログインユーザー取得
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -36,7 +37,7 @@ export default async function PostCreatePage({ params }: PostCreatePageProps) {
       title
     `,
     )
-    .eq("id", storyId)
+    .eq("id", storyIdNumber)
     .single();
 
   if (storyError || !story) {
@@ -50,14 +51,14 @@ export default async function PostCreatePage({ params }: PostCreatePageProps) {
       `
       id,
       body,
-      position,
-      author:profiles (
-        display_name
+      sequence_no,
+      author:users (
+        name
       )
     `,
     )
-    .eq("story_id", storyId)
-    .order("position", {
+    .eq("story_id", storyIdNumber)
+    .order("sequence_no", {
       ascending: false,
     })
     .limit(1)
@@ -90,11 +91,11 @@ export default async function PostCreatePage({ params }: PostCreatePageProps) {
           <div className={styles.latestPost}>
             <div className={styles.latestPostHeader}>
               <p className={styles.latestPostPosition}>
-                第{latestPost.position}節
+                第{latestPost.sequence_no}節
               </p>
 
               <p className={styles.latestPostAuthor}>
-                作者：{latestPost.author?.display_name}
+                作者：{latestPost.author?.name ?? "名前未設定"}
               </p>
             </div>
 
@@ -103,7 +104,7 @@ export default async function PostCreatePage({ params }: PostCreatePageProps) {
 
           <PostCreateForm
             storyId={story.id}
-            latestPosition={latestPost.position}
+            latestPosition={latestPost.sequence_no}
           />
         </section>
       </div>

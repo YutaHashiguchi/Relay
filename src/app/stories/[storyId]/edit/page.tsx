@@ -4,16 +4,18 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import StoryEditForm from "./_components/StoryEditForm";
-import styles from "../../new/styles.module.css";
+import type { StoryEditPageProps } from "./type";
 
-type StoryEditPageProps = {
-  params: Promise<{
-    storyId: string;
-  }>;
-};
+import styles from "../../new/styles.module.css";
 
 export default async function StoryEditPage({ params }: StoryEditPageProps) {
   const { storyId } = await params;
+
+  const storyIdNumber = Number(storyId);
+
+  if (!Number.isInteger(storyIdNumber) || storyIdNumber <= 0) {
+    notFound();
+  }
 
   const supabase = await createClient();
 
@@ -25,28 +27,47 @@ export default async function StoryEditPage({ params }: StoryEditPageProps) {
     redirect("/login");
   }
 
-  const { data: story, error } = await supabase
+  const { data: story, error: storyError } = await supabase
     .from("stories")
     .select(
       `
         id,
-        author_id,
+        user_id,
         title,
-        synopsis,
-        genre_slug
+        summary
       `,
     )
-    .eq("id", storyId)
+    .eq("id", storyIdNumber)
     .single();
 
-  if (error || !story) {
+  if (storyError || !story) {
     notFound();
   }
 
   // 作成者本人以外は編集ページを開けない
-  if (story.author_id !== user.id) {
+  if (story.user_id !== user.id) {
     redirect(`/stories/${storyId}`);
   }
+
+  const { data: storyGenre, error: storyGenreError } = await supabase
+    .from("story_genres")
+    .select(
+      `
+        genres (
+          slug
+        )
+      `,
+    )
+    .eq("story_id", storyIdNumber)
+    .limit(1)
+    .maybeSingle();
+
+  if (storyGenreError) {
+    console.error("Story genre fetch error:", storyGenreError);
+    notFound();
+  }
+
+  const genreSlug = storyGenre?.genres?.slug ?? "";
 
   return (
     <main className={styles.main}>
@@ -68,7 +89,14 @@ export default async function StoryEditPage({ params }: StoryEditPageProps) {
             <span>◆</span>
           </div>
 
-          <StoryEditForm story={story} />
+          <StoryEditForm
+            story={{
+              id: story.id,
+              title: story.title,
+              summary: story.summary,
+              genreSlug,
+            }}
+          />
         </section>
       </div>
     </main>

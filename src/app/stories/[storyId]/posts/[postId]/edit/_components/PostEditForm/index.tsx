@@ -7,17 +7,9 @@ import { useRouter } from "next/navigation";
 import SubmitButton from "@/components/SubmitButton";
 import Textarea from "@/components/Textarea";
 import { createClient } from "@/lib/supabase/client";
+import type { PostEditFormProps } from "./type";
 
 import styles from "./styles.module.css";
-
-type PostEditFormProps = {
-  post: {
-    id: string;
-    story_id: string;
-    body: string;
-    position: number;
-  };
-};
 
 export default function PostEditForm({ post }: PostEditFormProps) {
   const router = useRouter();

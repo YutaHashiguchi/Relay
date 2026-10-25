@@ -66,6 +66,9 @@ REVOKE ALL PRIVILEGES ON TABLE public.story_summaries_old FROM anon, authenticat
   ALTER TABLE public.genres_old RENAME CONSTRAINT genres_name_key TO genres_old_name_key;
   ALTER TABLE public.posts_old RENAME CONSTRAINT posts_pkey TO posts_old_pkey;
   ALTER TABLE public.posts_old RENAME CONSTRAINT posts_story_id_position_key TO posts_old_story_id_position_key;
+  ALTER TABLE public.posts_old
+  RENAME CONSTRAINT posts_story_id_fkey
+  TO posts_old_story_id_fkey;
   ALTER TABLE public.profiles_old RENAME CONSTRAINT profiles_pkey TO profiles_old_pkey;
   ALTER TABLE public.stories_old RENAME CONSTRAINT stories_pkey TO stories_old_pkey;
   ALTER TABLE public.story_summaries_old RENAME CONSTRAINT story_summaries_pkey TO story_summaries_old_pkey;
@@ -1003,3 +1006,4 @@ GRANT ALL PRIVILEGES ON TABLE public.users TO service_role;
     FOR DELETE
     TO authenticated
     USING (true);
+

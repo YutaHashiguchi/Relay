@@ -4,18 +4,24 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import PostEditForm from "./_components/PostEditForm";
+import type { PostEditPageProps } from "./type";
 
 import styles from "../../../../new/styles.module.css";
 
-type PostEditPageProps = {
-  params: Promise<{
-    storyId: string;
-    postId: string;
-  }>;
-};
-
 export default async function PostEditPage({ params }: PostEditPageProps) {
   const { storyId, postId } = await params;
+
+  const storyIdNumber = Number(storyId);
+  const postIdNumber = Number(postId);
+
+  if (
+    !Number.isInteger(storyIdNumber) ||
+    storyIdNumber <= 0 ||
+    !Number.isInteger(postIdNumber) ||
+    postIdNumber <= 0
+  ) {
+    notFound();
+  }
 
   const supabase = await createClient();
 
@@ -33,13 +39,13 @@ export default async function PostEditPage({ params }: PostEditPageProps) {
       `
       id,
       story_id,
-      author_id,
+      user_id,
       body,
-      position
+      sequence_no
     `,
     )
-    .eq("id", postId)
-    .eq("story_id", storyId)
+    .eq("id", postIdNumber)
+    .eq("story_id", storyIdNumber)
     .single();
 
   if (error || !post) {
@@ -47,15 +53,16 @@ export default async function PostEditPage({ params }: PostEditPageProps) {
   }
 
   // このPostを書いた本人以外は編集不可
-  if (post.author_id !== user.id) {
+  if (post.user_id !== user.id) {
     redirect(`/stories/${storyId}`);
   }
 
+  // 自分の投稿より後に続きが投稿されている場合は編集不可
   const { data: laterPost, error: laterPostError } = await supabase
     .from("posts")
     .select("id")
-    .eq("story_id", storyId)
-    .gt("position", post.position)
+    .eq("story_id", storyIdNumber)
+    .gt("sequence_no", post.sequence_no)
     .limit(1)
     .maybeSingle();
 
@@ -78,7 +85,7 @@ export default async function PostEditPage({ params }: PostEditPageProps) {
         <section className={styles.paper}>
           <p className={styles.eyebrow}>EDIT YOUR POST</p>
 
-          <h1 className={styles.title}>第{post.position}節を編集</h1>
+          <h1 className={styles.title}>第{post.sequence_no}節を編集</h1>
 
           <p className={styles.description}>
             あなたが投稿した本文を編集できます。

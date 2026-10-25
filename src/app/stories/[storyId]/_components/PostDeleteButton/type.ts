@@ -1,5 +1,5 @@
 export type PostDeleteButtonProps = {
-  postId: string;
-  storyId: string;
+  postId: number;
+  storyId: number;
   position: number;
 };

@@ -18,12 +18,8 @@ export default async function MyPage() {
 
   // プロフィール取得
   const { data: profile } = await supabase
-    .from("profiles")
-    .select(
-      `
-      display_name
-    `,
-    )
+    .from("users")
+    .select("name")
     .eq("id", user.id)
     .single();
 
@@ -34,17 +30,17 @@ export default async function MyPage() {
       `
       id,
       title,
-      synopsis,
+      summary,
       created_at,
-      genre:genres (
-        name
-      ),
-      posts (
-        id
+      posts_count,
+      story_genres (
+        genres (
+          name
+        )
       )
-    `,
+      `,
     )
-    .eq("author_id", user.id)
+    .eq("user_id", user.id)
     .order("created_at", {
       ascending: false,
     });
@@ -54,12 +50,8 @@ export default async function MyPage() {
   // 自分が投稿したPostからstory_idを取得
   const { data: myPosts } = await supabase
     .from("posts")
-    .select(
-      `
-      story_id
-    `,
-    )
-    .eq("author_id", user.id);
+    .select("story_id")
+    .eq("user_id", user.id);
 
   const participatedStoryIds = [
     ...new Set((myPosts ?? []).map((post) => post.story_id)),
@@ -74,21 +66,21 @@ export default async function MyPage() {
       .from("stories")
       .select(
         `
-      id,
-      author_id,
-      title,
-      synopsis,
-      created_at,
-      genre:genres (
-        name
-      ),
-      author:profiles (
-        display_name
-      ),
-      posts (
-        id
-      )
-      `,
+        id,
+        user_id,
+        title,
+        summary,
+        created_at,
+        posts_count,
+        story_genres (
+          genres (
+            name
+          )
+        ),
+        author:users (
+          name
+        )
+        `,
       )
       .in("id", participatedStoryIds)
       .order("created_at", {
@@ -96,7 +88,7 @@ export default async function MyPage() {
       });
 
     return (participatedStoriesData ?? []).filter(
-      (story) => story.author_id !== user.id,
+      (story) => story.user_id !== user.id,
     );
   };
 
@@ -108,9 +100,7 @@ export default async function MyPage() {
         <section className={styles.profile}>
           <p className={styles.eyebrow}>MY PAGE</p>
 
-          <h1 className={styles.name}>
-            {profile?.display_name ?? "名前未設定"}
-          </h1>
+          <h1 className={styles.name}>{profile?.name ?? "名前未設定"}</h1>
 
           <p className={styles.email}>{user.email}</p>
         </section>
@@ -138,46 +128,49 @@ export default async function MyPage() {
             </div>
           ) : (
             <div className={styles.storyGrid}>
-              {ownStories.map((story) => (
-                <article key={story.id} className={styles.storyCard}>
-                  <div className={styles.cardHeader}>
-                    <span className={styles.genre}>
-                      {story.genre?.name ?? "その他"}
-                    </span>
+              {ownStories.map((story) => {
+                const genreName =
+                  story.story_genres[0]?.genres?.name ?? "その他";
 
-                    <span className={styles.postCount}>
-                      {story.posts.length}節
-                    </span>
-                  </div>
+                return (
+                  <article key={story.id} className={styles.storyCard}>
+                    <div className={styles.cardHeader}>
+                      <span className={styles.genre}>{genreName}</span>
 
-                  <Link
-                    href={`/stories/${story.id}`}
-                    className={styles.storyTitle}
-                  >
-                    {story.title}
-                  </Link>
+                      <span className={styles.postCount}>
+                        {story.posts_count}節
+                      </span>
+                    </div>
 
-                  {story.synopsis && (
-                    <p className={styles.synopsis}>{story.synopsis}</p>
-                  )}
-
-                  <div className={styles.cardActions}>
                     <Link
                       href={`/stories/${story.id}`}
-                      className={styles.detailLink}
+                      className={styles.storyTitle}
                     >
-                      物語を読む
+                      {story.title}
                     </Link>
 
-                    <Link
-                      href={`/stories/${story.id}/edit`}
-                      className={styles.editLink}
-                    >
-                      作品情報を編集
-                    </Link>
-                  </div>
-                </article>
-              ))}
+                    {story.summary && (
+                      <p className={styles.synopsis}>{story.summary}</p>
+                    )}
+
+                    <div className={styles.cardActions}>
+                      <Link
+                        href={`/stories/${story.id}`}
+                        className={styles.detailLink}
+                      >
+                        物語を読む
+                      </Link>
+
+                      <Link
+                        href={`/stories/${story.id}/edit`}
+                        className={styles.editLink}
+                      >
+                        作品情報を編集
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
@@ -197,44 +190,46 @@ export default async function MyPage() {
             </div>
           ) : (
             <div className={styles.storyGrid}>
-              {participatedStories.map((story) => (
-                <article key={story.id} className={styles.storyCard}>
-                  <div className={styles.cardHeader}>
-                    <span className={styles.genre}>
-                      {story.genre?.name ?? "その他"}
-                    </span>
+              {participatedStories.map((story) => {
+                const genreName =
+                  story.story_genres[0]?.genres?.name ?? "その他";
 
-                    <span className={styles.postCount}>
-                      {story.posts.length}節
-                    </span>
-                  </div>
+                return (
+                  <article key={story.id} className={styles.storyCard}>
+                    <div className={styles.cardHeader}>
+                      <span className={styles.genre}>{genreName}</span>
 
-                  <Link
-                    href={`/stories/${story.id}`}
-                    className={styles.storyTitle}
-                  >
-                    {story.title}
-                  </Link>
+                      <span className={styles.postCount}>
+                        {story.posts_count}節
+                      </span>
+                    </div>
 
-                  <p className={styles.author}>
-                    作者：
-                    {story.author?.display_name ?? "名前未設定"}
-                  </p>
-
-                  {story.synopsis && (
-                    <p className={styles.synopsis}>{story.synopsis}</p>
-                  )}
-
-                  <div className={styles.cardActions}>
                     <Link
                       href={`/stories/${story.id}`}
-                      className={styles.detailLink}
+                      className={styles.storyTitle}
                     >
-                      物語を読む
+                      {story.title}
                     </Link>
-                  </div>
-                </article>
-              ))}
+
+                    <p className={styles.author}>
+                      作者：{story.author?.name ?? "名前未設定"}
+                    </p>
+
+                    {story.summary && (
+                      <p className={styles.synopsis}>{story.summary}</p>
+                    )}
+
+                    <div className={styles.cardActions}>
+                      <Link
+                        href={`/stories/${story.id}`}
+                        className={styles.detailLink}
+                      >
+                        物語を読む
+                      </Link>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>

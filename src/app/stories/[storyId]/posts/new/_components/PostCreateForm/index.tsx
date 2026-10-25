@@ -7,13 +7,9 @@ import { useRouter } from "next/navigation";
 import SubmitButton from "@/components/SubmitButton";
 import Textarea from "@/components/Textarea";
 import { createClient } from "@/lib/supabase/client";
+import type { PostCreateFormProps } from "./type";
 
 import styles from "./styles.module.css";
-
-type PostCreateFormProps = {
-  storyId: string;
-  latestPosition: number;
-};
 
 export default function PostCreateForm({
   storyId,
@@ -156,9 +152,9 @@ export default function PostCreateForm({
 
       const { error: insertError } = await supabase.from("posts").insert({
         story_id: storyId,
-        author_id: user.id,
+        user_id: user.id,
         body: trimmedBody,
-        position: nextPosition,
+        sequence_no: nextPosition,
       });
 
       if (insertError) {
