@@ -3,20 +3,22 @@ import { notFound } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 
-import styles from "./styles.module.css";
-import StorySummary from "./_components/StorySummary";
 import PostDeleteButton from "./_components/PostDeleteButton";
+import StorySummary from "./_components/StorySummary";
+import type { StoryDetailPageProps } from "./type";
 
-type StoryDetailPageProps = {
-  params: Promise<{
-    storyId: string;
-  }>;
-};
+import styles from "./styles.module.css";
 
 export default async function StoryDetailPage({
   params,
 }: StoryDetailPageProps) {
   const { storyId } = await params;
+
+  const storyIdNumber = Number(storyId);
+
+  if (!Number.isInteger(storyIdNumber) || storyIdNumber <= 0) {
+    notFound();
+  }
 
   const supabase = await createClient();
 
@@ -25,29 +27,31 @@ export default async function StoryDetailPage({
     .select(
       `
       id,
-      author_id,
+      user_id,
       title,
-      synopsis,
+      summary,
       created_at,
-      genre:genres (
+      author:users (
         name
       ),
-      author:profiles (
-        display_name
+      story_genres (
+        genres (
+          name
+        )
       ),
-      posts (
+      posts:posts!posts_story_id_fkey (
   id,
-  author_id,
+  user_id,
   body,
-  position,
+  sequence_no,
   created_at,
-  author:profiles (
-    display_name
+  author:users (
+    name
   )
 )
-    `,
+      `,
     )
-    .eq("id", storyId)
+    .eq("id", storyIdNumber)
     .single();
 
   if (error || !story) {
@@ -63,12 +67,12 @@ export default async function StoryDetailPage({
     .from("story_writing_locks")
     .select(
       `
-    user_id,
-    expires_at
-    `,
+      user_id,
+      expires_at
+      `,
     )
     .eq("story_id", story.id)
-    .gt("expires_at", "now")
+    .gt("expires_at", new Date().toISOString())
     .maybeSingle();
 
   const isMyLock = Boolean(writingLock) && user?.id === writingLock?.user_id;
@@ -76,21 +80,24 @@ export default async function StoryDetailPage({
   const isLockedByOther =
     Boolean(writingLock) && user?.id !== writingLock?.user_id;
 
-  const isOwner = user?.id === story.author_id;
+  const isOwner = user?.id === story.user_id;
 
   const { data: storySummary } = await supabase
     .from("story_summaries")
     .select(
       `
-    summary,
-    summarized_until_position
-    `,
+      summary,
+      summarized_until_position
+      `,
     )
     .eq("story_id", story.id)
     .maybeSingle();
 
-  const posts = [...story.posts].sort((a, b) => a.position - b.position);
-  const latestPosition = posts.at(-1)?.position;
+  const posts = [...story.posts].sort((a, b) => a.sequence_no - b.sequence_no);
+
+  const latestSequenceNo = posts.at(-1)?.sequence_no;
+
+  const genreName = story.story_genres[0]?.genres?.name ?? "その他";
 
   return (
     <main className={styles.main}>
@@ -101,11 +108,13 @@ export default async function StoryDetailPage({
 
         <article className={styles.paper}>
           <header className={styles.header}>
-            <p className={styles.genre}>{story.genre?.name}</p>
+            <p className={styles.genre}>{genreName}</p>
 
             <h1 className={styles.title}>{story.title}</h1>
 
-            <p className={styles.author}>作者：{story.author?.display_name}</p>
+            <p className={styles.author}>
+              作者：{story.author?.name ?? "名前未設定"}
+            </p>
 
             {isOwner && (
               <Link
@@ -116,14 +125,15 @@ export default async function StoryDetailPage({
               </Link>
             )}
 
-            {story.synopsis && (
-              <p className={styles.synopsis}>{story.synopsis}</p>
+            {story.summary && (
+              <p className={styles.synopsis}>{story.summary}</p>
             )}
 
             <div className={styles.divider}>
               <span>◆</span>
             </div>
           </header>
+
           {storySummary && (
             <StorySummary
               summary={storySummary.summary}
@@ -135,13 +145,13 @@ export default async function StoryDetailPage({
             {posts.map((post) => (
               <section key={post.id} className={styles.post}>
                 <div className={styles.postHeader}>
-                  <span>第{post.position}節</span>
+                  <span>第{post.sequence_no}節</span>
 
                   <div className={styles.postMeta}>
-                    <span>{post.author?.display_name}</span>
+                    <span>{post.author?.name ?? "名前未設定"}</span>
 
-                    {user?.id === post.author_id &&
-                      post.position === latestPosition && (
+                    {user?.id === post.user_id &&
+                      post.sequence_no === latestSequenceNo && (
                         <>
                           <Link
                             href={`/stories/${story.id}/posts/${post.id}/edit`}
@@ -153,7 +163,7 @@ export default async function StoryDetailPage({
                           <PostDeleteButton
                             postId={post.id}
                             storyId={story.id}
-                            position={post.position}
+                            position={post.sequence_no}
                           />
                         </>
                       )}
@@ -164,6 +174,7 @@ export default async function StoryDetailPage({
               </section>
             ))}
           </div>
+
           <div className={styles.actions}>
             {isLockedByOther ? (
               <div className={styles.lockedArea}>

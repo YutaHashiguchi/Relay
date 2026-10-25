@@ -8,8 +8,9 @@ import Input from "@/components/Input";
 import SelectBox from "@/components/SelectBox";
 import SubmitButton from "@/components/SubmitButton";
 import Textarea from "@/components/Textarea";
-import { createClient } from "@/lib/supabase/client";
 import { GENRE_OPTIONS } from "@/constants/genres";
+import { createClient } from "@/lib/supabase/client";
+
 import styles from "./styles.module.css";
 
 export default function StoryCreateForm() {
@@ -57,7 +58,6 @@ export default function StoryCreateForm() {
     const supabase = createClient();
 
     try {
-      // ログインユーザーを取得
       const {
         data: { user },
         error: userError,
@@ -68,14 +68,28 @@ export default function StoryCreateForm() {
         return;
       }
 
+      // 選択されたジャンルのIDを取得
+      const { data: genreData, error: genreError } = await supabase
+        .from("genres")
+        .select("id")
+        .eq("slug", genre)
+        .eq("is_active", true)
+        .single();
+
+      if (genreError || !genreData) {
+        console.error(genreError);
+
+        setErrorMessage("ジャンル情報の取得に失敗しました。");
+        return;
+      }
+
       // Storyを作成
       const { data: story, error: storyError } = await supabase
         .from("stories")
         .insert({
-          author_id: user.id,
+          user_id: user.id,
           title: trimmedTitle,
-          synopsis: trimmedSynopsis || null,
-          genre_slug: genre,
+          summary: trimmedSynopsis || null,
         })
         .select("id")
         .single();
@@ -87,26 +101,64 @@ export default function StoryCreateForm() {
         return;
       }
 
-      // 最初のPostを登録
-      const { error: postError } = await supabase.from("posts").insert({
-        story_id: story.id,
-        author_id: user.id,
-        body: trimmedBody,
-        position: 1,
-      });
+      // Storyとジャンルを紐付け
+      const { error: storyGenreError } = await supabase
+        .from("story_genres")
+        .insert({
+          story_id: story.id,
+          genre_id: genreData.id,
+        });
 
-      if (postError) {
+      if (storyGenreError) {
+        console.error(storyGenreError);
+
+        await supabase.from("stories").delete().eq("id", story.id);
+
+        setErrorMessage("ジャンルの登録に失敗しました。");
+        return;
+      }
+
+      // 最初のPostを登録
+      const { data: post, error: postError } = await supabase
+        .from("posts")
+        .insert({
+          story_id: story.id,
+          user_id: user.id,
+          body: trimmedBody,
+          sequence_no: 1,
+        })
+        .select("id, created_at")
+        .single();
+
+      if (postError || !post) {
         console.error(postError);
 
-        // Postの登録に失敗した場合は、
-        // 作成済みのStoryを削除する
+        // stories削除時にstory_genresもCASCADEで削除される
         await supabase.from("stories").delete().eq("id", story.id);
 
         setErrorMessage("本文の投稿に失敗しました。");
         return;
       }
 
-      // 作成したStoryの詳細ページへ移動
+      // 作品の集計情報を更新
+      const { error: storyUpdateError } = await supabase
+        .from("stories")
+        .update({
+          latest_post_id: post.id,
+          posts_count: 1,
+          last_posted_at: post.created_at,
+        })
+        .eq("id", story.id);
+
+      if (storyUpdateError) {
+        console.error(storyUpdateError);
+
+        await supabase.from("stories").delete().eq("id", story.id);
+
+        setErrorMessage("作品情報の更新に失敗しました。");
+        return;
+      }
+
       router.push(`/stories/${story.id}`);
       router.refresh();
     } catch (error) {

@@ -3,10 +3,24 @@ import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
 
-import type { RouteContext, StoryPost, StorySummary } from "./type";
+import type { RouteContext, StoryPost } from "./type";
 
 export async function POST(_request: Request, { params }: RouteContext) {
   const { storyId } = await params;
+
+  // URLパラメータはstringなので、DBのbigintに合わせてnumberへ変換
+  const storyIdNumber = Number(storyId);
+
+  if (!Number.isInteger(storyIdNumber) || storyIdNumber <= 0) {
+    return NextResponse.json(
+      {
+        error: "不正な作品IDです。",
+      },
+      {
+        status: 400,
+      },
+    );
+  }
 
   const supabase = await createClient();
 
@@ -28,7 +42,7 @@ export async function POST(_request: Request, { params }: RouteContext) {
   const { data: story, error: storyError } = await supabase
     .from("stories")
     .select("id, title")
-    .eq("id", storyId)
+    .eq("id", storyIdNumber)
     .single();
 
   if (storyError || !story) {
@@ -45,9 +59,9 @@ export async function POST(_request: Request, { params }: RouteContext) {
   // 現在の最新節を取得
   const { data: latestPost, error: latestPostError } = await supabase
     .from("posts")
-    .select("position")
-    .eq("story_id", storyId)
-    .order("position", {
+    .select("sequence_no")
+    .eq("story_id", storyIdNumber)
+    .order("sequence_no", {
       ascending: false,
     })
     .limit(1)
@@ -77,7 +91,7 @@ export async function POST(_request: Request, { params }: RouteContext) {
     );
   }
 
-  const latestPosition = latestPost.position;
+  const latestPosition = latestPost.sequence_no;
 
   // AI要約は5節ごとだけ更新する
   if (latestPosition < 5 || latestPosition % 5 !== 0) {
@@ -92,10 +106,10 @@ export async function POST(_request: Request, { params }: RouteContext) {
   }
 
   // 既存の要約を取得
-  const { data: existingSummaryData, error: summaryFetchError } = await supabase
+  const { data: existingSummary, error: summaryFetchError } = await supabase
     .from("story_summaries")
     .select("summary, summarized_until_position")
-    .eq("story_id", storyId)
+    .eq("story_id", storyIdNumber)
     .maybeSingle();
 
   if (summaryFetchError) {
@@ -110,8 +124,6 @@ export async function POST(_request: Request, { params }: RouteContext) {
       },
     );
   }
-
-  const existingSummary = existingSummaryData as StorySummary | null;
 
   // すでに今回の節まで要約済みなら再生成しない
   if (
@@ -130,11 +142,11 @@ export async function POST(_request: Request, { params }: RouteContext) {
   // 前回要約した続きだけ取得
   const { data: newPostsData, error: postsError } = await supabase
     .from("posts")
-    .select("body, position")
-    .eq("story_id", storyId)
-    .gt("position", summarizedUntilPosition)
-    .lte("position", latestPosition)
-    .order("position", {
+    .select("body, sequence_no")
+    .eq("story_id", storyIdNumber)
+    .gt("sequence_no", summarizedUntilPosition)
+    .lte("sequence_no", latestPosition)
+    .order("sequence_no", {
       ascending: true,
     });
 
@@ -151,7 +163,7 @@ export async function POST(_request: Request, { params }: RouteContext) {
     );
   }
 
-  const newPosts = newPostsData as StoryPost[];
+  const newPosts: StoryPost[] = newPostsData;
 
   if (newPosts.length === 0) {
     return NextResponse.json(
@@ -166,7 +178,7 @@ export async function POST(_request: Request, { params }: RouteContext) {
 
   const newStoryText = newPosts
     .map((post) => {
-      return `第${post.position}節\n${post.body}`;
+      return `第${post.sequence_no}節\n${post.body}`;
     })
     .join("\n\n");
 
@@ -247,7 +259,7 @@ ${newStoryText}
       .from("story_summaries")
       .upsert(
         {
-          story_id: storyId,
+          story_id: storyIdNumber,
           summary,
           summarized_until_position: latestPosition,
           updated_at: new Date().toISOString(),

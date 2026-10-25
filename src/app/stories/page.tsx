@@ -2,14 +2,9 @@ import Link from "next/link";
 
 import { createClient } from "@/lib/supabase/server";
 
-import styles from "./styles.module.css";
+import type { StoriesPageProps } from "./type";
 
-type StoriesPageProps = {
-  searchParams: Promise<{
-    q?: string;
-    genre?: string;
-  }>;
-};
+import styles from "./styles.module.css";
 
 export default async function StoriesPage({ searchParams }: StoriesPageProps) {
   const params = await searchParams;
@@ -26,21 +21,23 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
       `
       id,
       title,
-      synopsis,
-      genre_slug,
+      summary,
       created_at,
-      author:profiles (
-        display_name
-      ),
-      genre:genres (
+      author:users (
         name
       ),
-      posts (
-        id,
-        body,
-        position
-      )
-    `,
+      story_genres (
+        genres (
+          name,
+          slug
+        )
+      ),
+      posts:posts!posts_story_id_fkey (
+  id,
+  body,
+  sequence_no
+)
+      `,
     )
     .order("created_at", {
       ascending: false,
@@ -53,8 +50,9 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
       `
       slug,
       name
-    `,
+      `,
     )
+    .eq("is_active", true)
     .order("sort_order", {
       ascending: true,
     });
@@ -67,7 +65,11 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
 
   const filteredStories = (stories ?? []).filter((story) => {
     // ジャンル
-    const matchesGenre = !selectedGenre || story.genre_slug === selectedGenre;
+    const matchesGenre =
+      !selectedGenre ||
+      story.story_genres.some(
+        (storyGenre) => storyGenre.genres?.slug === selectedGenre,
+      );
 
     if (!matchesGenre) {
       return false;
@@ -82,7 +84,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
       .toLocaleLowerCase()
       .includes(normalizedKeyword);
 
-    const matchesSynopsis = (story.synopsis ?? "")
+    const matchesSummary = (story.summary ?? "")
       .toLocaleLowerCase()
       .includes(normalizedKeyword);
 
@@ -90,7 +92,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
       post.body.toLocaleLowerCase().includes(normalizedKeyword),
     );
 
-    return matchesTitle || matchesSynopsis || matchesPost;
+    return matchesTitle || matchesSummary || matchesPost;
   });
 
   return (
@@ -174,17 +176,17 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
           <div className={styles.storyList}>
             {filteredStories.map((story) => {
               const sortedPosts = [...story.posts].sort(
-                (a, b) => a.position - b.position,
+                (a, b) => a.sequence_no - b.sequence_no,
               );
 
               const latestPost = sortedPosts.at(-1);
 
+              const genreName = story.story_genres[0]?.genres?.name ?? "その他";
+
               return (
                 <article key={story.id} className={styles.storyCard}>
                   <div className={styles.cardTop}>
-                    <span className={styles.genre}>
-                      {story.genre?.name ?? "その他"}
-                    </span>
+                    <span className={styles.genre}>{genreName}</span>
 
                     <span className={styles.postCount}>
                       {story.posts.length}節
@@ -199,18 +201,17 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
                   </Link>
 
                   <p className={styles.author}>
-                    {story.author?.display_name ?? "名前未設定"}
+                    {story.author?.name ?? "名前未設定"}
                   </p>
 
-                  {story.synopsis && (
-                    <p className={styles.synopsis}>{story.synopsis}</p>
+                  {story.summary && (
+                    <p className={styles.synopsis}>{story.summary}</p>
                   )}
 
                   {latestPost && (
                     <div className={styles.latestPost}>
                       <p className={styles.latestPostLabel}>
-                        最新・第
-                        {latestPost.position}節
+                        最新・第{latestPost.sequence_no}節
                       </p>
 
                       <p className={styles.latestPostBody}>{latestPost.body}</p>

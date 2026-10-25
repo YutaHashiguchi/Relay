@@ -10,24 +10,16 @@ import SubmitButton from "@/components/SubmitButton";
 import Textarea from "@/components/Textarea";
 import { createClient } from "@/lib/supabase/client";
 import { GENRE_OPTIONS } from "@/constants/genres";
+import type { StoryEditFormProps } from "./type";
 
 import styles from "./styles.module.css";
-
-type StoryEditFormProps = {
-  story: {
-    id: string;
-    title: string;
-    synopsis: string | null;
-    genre_slug: string;
-  };
-};
 
 export default function StoryEditForm({ story }: StoryEditFormProps) {
   const router = useRouter();
 
   const [title, setTitle] = useState(story.title);
-  const [genre, setGenre] = useState(story.genre_slug);
-  const [synopsis, setSynopsis] = useState(story.synopsis ?? "");
+  const [genre, setGenre] = useState(story.genreSlug);
+  const [synopsis, setSynopsis] = useState(story.summary ?? "");
 
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -60,20 +52,72 @@ export default function StoryEditForm({ story }: StoryEditFormProps) {
     const supabase = createClient();
 
     try {
-      const { error } = await supabase
+      const { data: genreData, error: genreError } = await supabase
+        .from("genres")
+        .select("id")
+        .eq("slug", genre)
+        .eq("is_active", true)
+        .single();
+
+      if (genreError || !genreData) {
+        console.error("Genre fetch error:", genreError);
+        setErrorMessage("ジャンル情報の取得に失敗しました。");
+        return;
+      }
+
+      const { error: storyError } = await supabase
         .from("stories")
         .update({
           title: trimmedTitle,
-          synopsis: trimmedSynopsis || null,
-          genre_slug: genre,
+          summary: trimmedSynopsis || null,
         })
         .eq("id", story.id);
 
-      if (error) {
-        console.error("Story update error:", error);
-
+      if (storyError) {
+        console.error("Story update error:", storyError);
         setErrorMessage("作品情報の更新に失敗しました。");
         return;
+      }
+
+      const { data: storyGenre, error: storyGenreFetchError } = await supabase
+        .from("story_genres")
+        .select("id, genre_id")
+        .eq("story_id", story.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (storyGenreFetchError) {
+        console.error("Story genre fetch error:", storyGenreFetchError);
+        setErrorMessage("ジャンル情報の更新に失敗しました。");
+        return;
+      }
+
+      if (storyGenre) {
+        const { error: storyGenreUpdateError } = await supabase
+          .from("story_genres")
+          .update({
+            genre_id: genreData.id,
+          })
+          .eq("id", storyGenre.id);
+
+        if (storyGenreUpdateError) {
+          console.error("Story genre update error:", storyGenreUpdateError);
+          setErrorMessage("ジャンル情報の更新に失敗しました。");
+          return;
+        }
+      } else {
+        const { error: storyGenreInsertError } = await supabase
+          .from("story_genres")
+          .insert({
+            story_id: story.id,
+            genre_id: genreData.id,
+          });
+
+        if (storyGenreInsertError) {
+          console.error("Story genre insert error:", storyGenreInsertError);
+          setErrorMessage("ジャンル情報の更新に失敗しました。");
+          return;
+        }
       }
 
       router.push(`/stories/${story.id}`);

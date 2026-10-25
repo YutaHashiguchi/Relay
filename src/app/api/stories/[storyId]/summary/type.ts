@@ -4,12 +4,7 @@ export type RouteContext = {
   }>;
 };
 
-export type StorySummary = {
-  summary: string;
-  summarized_until_position: number;
-};
-
 export type StoryPost = {
   body: string;
-  position: number;
+  sequence_no: number;
 };

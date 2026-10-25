@@ -18,11 +18,8 @@ function formatRelativeTime(dateString: string) {
   const now = new Date();
 
   const diffMs = now.getTime() - createdAt.getTime();
-
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
-
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   if (diffMinutes < 1) {
@@ -53,21 +50,21 @@ export default async function HomePage() {
       `
       id,
       title,
-      synopsis,
+      summary,
       created_at,
-      author:profiles (
-        display_name
-      ),
-      genre:genres (
+      last_posted_at,
+      posts_count,
+      author:users (
         name
       ),
-      posts (
-        id,
-        position,
-        created_at
+      story_genres (
+        genres (
+          name
+        )
       )
-    `,
+      `,
     )
+    .eq("status", "published")
     .order("created_at", {
       ascending: false,
     });
@@ -80,49 +77,43 @@ export default async function HomePage() {
 
   // 新着順で3作品
   const newStories = allStories.slice(0, 3).map((story) => {
-    const latestPost = [...story.posts].sort(
-      (a, b) => b.position - a.position,
-    )[0];
+    const genreName = story.story_genres[0]?.genres?.name ?? "その他";
 
     return {
       id: story.id,
       title: story.title,
-      synopsis: story.synopsis ?? "",
-      genre: story.genre?.name ?? "その他",
-      authorName: story.author?.display_name ?? "名前未設定",
-      latestPost: latestPost
-        ? formatRelativeTime(latestPost.created_at)
-        : formatRelativeTime(story.created_at),
+      synopsis: story.summary ?? "",
+      genre: genreName,
+      authorName: story.author?.name ?? "名前未設定",
+      latestPost: formatRelativeTime(story.last_posted_at ?? story.created_at),
     };
   });
 
-  // Post数が多い順で3作品
+  // 投稿数が多い順で3作品
   const popularStories = [...allStories]
     .sort((a, b) => {
-      if (b.posts.length !== a.posts.length) {
-        return b.posts.length - a.posts.length;
+      if (b.posts_count !== a.posts_count) {
+        return b.posts_count - a.posts_count;
       }
 
-      // Post数が同じなら新しい作品を上にする
+      // 投稿数が同じなら新しい作品を上にする
       return (
         new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
     })
     .slice(0, 3)
     .map((story) => {
-      const latestPost = [...story.posts].sort(
-        (a, b) => b.position - a.position,
-      )[0];
+      const genreName = story.story_genres[0]?.genres?.name ?? "その他";
 
       return {
         id: story.id,
         title: story.title,
-        synopsis: story.synopsis ?? "",
-        genre: story.genre?.name ?? "その他",
-        authorName: story.author?.display_name ?? "名前未設定",
-        latestPost: latestPost
-          ? formatRelativeTime(latestPost.created_at)
-          : formatRelativeTime(story.created_at),
+        synopsis: story.summary ?? "",
+        genre: genreName,
+        authorName: story.author?.name ?? "名前未設定",
+        latestPost: formatRelativeTime(
+          story.last_posted_at ?? story.created_at,
+        ),
       };
     });
 
