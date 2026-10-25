@@ -41,45 +41,6 @@
   border-radius: 2px;
 }
 
-.description {
-  margin: 12px 0 0;
-
-  color: #887667;
-
-  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
-
-  font-size: 13px;
-  line-height: 1.8;
-}
-
-.summaryButton {
-  display: block;
-
-  padding: 10px 18px;
-  margin: 20px auto 0;
-
-  color: #754230;
-
-  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
-
-  background: transparent;
-
-  border: 1px solid #9f806f;
-  border-radius: 3px;
-
-  cursor: pointer;
-}
-
-.summaryButton:hover:not(:disabled) {
-  color: #fff8e8;
-  background-color: #754230;
-}
-
-.summaryButton:disabled {
-  cursor: wait;
-  opacity: 0.6;
-}
-
 .result {
   padding: 22px 24px;
   margin-top: 24px;
@@ -108,24 +69,6 @@
   font-size: 14px;
   line-height: 2;
   white-space: pre-wrap;
-}
-
-.errorMessage {
-  margin: 18px 0 0;
-
-  color: #842f26;
-
-  font-size: 13px;
-  text-align: center;
-}
-
-.loginMessage {
-  margin: 18px 0 0;
-
-  color: #8a7d6d;
-
-  font-size: 13px;
-  text-align: center;
 }
 
 @media (max-width: 640px) {

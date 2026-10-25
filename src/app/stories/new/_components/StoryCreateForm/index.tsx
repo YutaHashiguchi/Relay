@@ -9,43 +9,8 @@ import SelectBox from "@/components/SelectBox";
 import SubmitButton from "@/components/SubmitButton";
 import Textarea from "@/components/Textarea";
 import { createClient } from "@/lib/supabase/client";
-
+import { GENRE_OPTIONS } from "@/constants/genres";
 import styles from "./styles.module.css";
-
-const genreOptions = [
-  {
-    value: "fantasy",
-    label: "ファンタジー",
-  },
-  {
-    value: "romance",
-    label: "恋愛",
-  },
-  {
-    value: "mystery",
-    label: "ミステリー",
-  },
-  {
-    value: "science-fiction",
-    label: "SF",
-  },
-  {
-    value: "horror",
-    label: "ホラー",
-  },
-  {
-    value: "youth",
-    label: "青春",
-  },
-  {
-    value: "daily-life",
-    label: "日常",
-  },
-  {
-    value: "other",
-    label: "その他",
-  },
-];
 
 export default function StoryCreateForm() {
   const router = useRouter();
@@ -176,7 +141,7 @@ export default function StoryCreateForm() {
         label="ジャンル"
         value={genre}
         onChange={(event) => setGenre(event.target.value)}
-        options={genreOptions}
+        options={GENRE_OPTIONS}
         disabled={isLoading}
         required
       />

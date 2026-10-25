@@ -8,10 +8,7 @@ export type SelectOption = {
 export type SelectBoxProps = {
   id: string;
   label: string;
-  options: SelectOption[];
+  options: readonly SelectOption[];
   placeholder?: string;
   error?: string;
-} & Omit<
-  SelectHTMLAttributes<HTMLSelectElement>,
-  "id" | "children"
->;
+} & Omit<SelectHTMLAttributes<HTMLSelectElement>, "id" | "children">;

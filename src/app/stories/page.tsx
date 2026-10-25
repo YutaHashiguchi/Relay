@@ -4,15 +4,6 @@ import { createClient } from "@/lib/supabase/server";
 
 import styles from "./styles.module.css";
 
-type StoryListItem = {
-  id: string;
-  title: string;
-  synopsis: string | null;
-  created_at: string;
-  genre: { name: string } | null;
-  author: { display_name: string } | null;
-};
-
 type StoriesPageProps = {
   searchParams: Promise<{
     q?: string;
@@ -53,8 +44,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
     )
     .order("created_at", {
       ascending: false,
-    })
-    .overrideTypes<StoryListItem[]>();
+    });
 
   // ジャンル一覧取得
   const { data: genres } = await supabase
@@ -112,7 +102,7 @@ export default async function StoriesPage({ searchParams }: StoriesPageProps) {
           <h1 className={styles.title}>物語を探す</h1>
 
           <p className={styles.description}>
-            誰かが紡ぎ始めた物語を見つけて、 その続きをつないでみませんか。
+            誰かが紡ぎ始めた物語を見つけて、その続きをつないでみませんか。
           </p>
         </section>
 

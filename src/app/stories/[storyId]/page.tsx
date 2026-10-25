@@ -5,24 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import styles from "./styles.module.css";
 import StorySummary from "./_components/StorySummary";
-
-type StoryDetail = {
-  id: string;
-  author_id: string;
-  title: string;
-  synopsis: string | null;
-  created_at: string;
-  genre: { name: string } | null;
-  author: { display_name: string } | null;
-  posts: {
-    id: string;
-    author_id: string;
-    body: string;
-    position: number;
-    created_at: string;
-    author: { display_name: string } | null;
-  }[];
-};
+import PostDeleteButton from "./_components/PostDeleteButton";
 
 type StoryDetailPageProps = {
   params: Promise<{
@@ -65,8 +48,7 @@ export default async function StoryDetailPage({
     `,
     )
     .eq("id", storyId)
-    .single()
-    .overrideTypes<StoryDetail>();
+    .single();
 
   if (error || !story) {
     notFound();
@@ -76,28 +58,39 @@ export default async function StoryDetailPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // 現在の執筆ロックを取得
+  // 有効期限内の執筆ロックだけ取得
   const { data: writingLock } = await supabase
     .from("story_writing_locks")
     .select(
       `
     user_id,
     expires_at
-  `,
+    `,
+    )
+    .eq("story_id", story.id)
+    .gt("expires_at", "now")
+    .maybeSingle();
+
+  const isMyLock = Boolean(writingLock) && user?.id === writingLock?.user_id;
+
+  const isLockedByOther =
+    Boolean(writingLock) && user?.id !== writingLock?.user_id;
+
+  const isOwner = user?.id === story.author_id;
+
+  const { data: storySummary } = await supabase
+    .from("story_summaries")
+    .select(
+      `
+    summary,
+    summarized_until_position
+    `,
     )
     .eq("story_id", story.id)
     .maybeSingle();
 
-  const isActiveLock =
-    writingLock && new Date(writingLock.expires_at).getTime() > Date.now();
-
-  const isMyLock = isActiveLock && user?.id === writingLock.user_id;
-
-  const isLockedByOther = isActiveLock && user?.id !== writingLock.user_id;
-
-  const isOwner = user?.id === story.author_id;
-
   const posts = [...story.posts].sort((a, b) => a.position - b.position);
+  const latestPosition = posts.at(-1)?.position;
 
   return (
     <main className={styles.main}>
@@ -130,8 +123,13 @@ export default async function StoryDetailPage({
             <div className={styles.divider}>
               <span>◆</span>
             </div>
-            <StorySummary storyId={story.id} isLoggedIn={Boolean(user)} />
           </header>
+          {storySummary && (
+            <StorySummary
+              summary={storySummary.summary}
+              summarizedUntilPosition={storySummary.summarized_until_position}
+            />
+          )}
 
           <div className={styles.posts}>
             {posts.map((post) => (
@@ -142,14 +140,23 @@ export default async function StoryDetailPage({
                   <div className={styles.postMeta}>
                     <span>{post.author?.display_name}</span>
 
-                    {user?.id === post.author_id && (
-                      <Link
-                        href={`/stories/${story.id}/posts/${post.id}/edit`}
-                        className={styles.postEditLink}
-                      >
-                        本文を編集
-                      </Link>
-                    )}
+                    {user?.id === post.author_id &&
+                      post.position === latestPosition && (
+                        <>
+                          <Link
+                            href={`/stories/${story.id}/posts/${post.id}/edit`}
+                            className={styles.postEditLink}
+                          >
+                            本文を編集
+                          </Link>
+
+                          <PostDeleteButton
+                            postId={post.id}
+                            storyId={story.id}
+                            position={post.position}
+                          />
+                        </>
+                      )}
                   </div>
                 </div>
 

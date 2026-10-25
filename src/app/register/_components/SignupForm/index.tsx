@@ -75,8 +75,6 @@ export default function SignupForm() {
         return;
       }
 
-      console.log("Signup data:", data);
-
       // メール認証なしの場合
       if (data.session) {
         router.push("/");

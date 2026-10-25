@@ -4,5 +4,5 @@ export type Genre = {
 };
 
 export type GenreListProps = {
-  genres?: Genre[];
+  genres?: readonly Genre[];
 };

@@ -2,43 +2,9 @@ import Link from "next/link";
 
 import type { GenreListProps } from "./type";
 import styles from "./styles.module.css";
+import { GENRE_OPTIONS } from "@/constants/genres";
 
-const defaultGenres = [
-  {
-    label: "ファンタジー",
-    value: "fantasy",
-  },
-  {
-    label: "恋愛",
-    value: "romance",
-  },
-  {
-    label: "ミステリー",
-    value: "mystery",
-  },
-  {
-    label: "SF",
-    value: "science-fiction",
-  },
-  {
-    label: "ホラー",
-    value: "horror",
-  },
-  {
-    label: "青春",
-    value: "youth",
-  },
-  {
-    label: "日常",
-    value: "daily-life",
-  },
-  {
-    label: "その他",
-    value: "other",
-  },
-];
-
-export default function GenreList({ genres = defaultGenres }: GenreListProps) {
+export default function GenreList({ genres = GENRE_OPTIONS }: GenreListProps) {
   return (
     <div className={styles.genreList}>
       {genres.map((genre) => (

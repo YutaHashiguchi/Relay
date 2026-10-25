@@ -13,27 +13,6 @@ const tangerine = Tangerine({
   display: "swap",
 });
 
-type StoryRow = {
-  id: string;
-  title: string;
-  synopsis: string | null;
-  created_at: string;
-
-  author: {
-    display_name: string;
-  } | null;
-
-  genre: {
-    name: string;
-  } | null;
-
-  posts: {
-    id: string;
-    position: number;
-    created_at: string;
-  }[];
-};
-
 function formatRelativeTime(dateString: string) {
   const createdAt = new Date(dateString);
   const now = new Date();
@@ -97,7 +76,7 @@ export default async function HomePage() {
     console.error("Stories fetch error:", error);
   }
 
-  const allStories = (storiesData ?? []) as unknown as StoryRow[];
+  const allStories = storiesData ?? [];
 
   // 新着順で3作品
   const newStories = allStories.slice(0, 3).map((story) => {

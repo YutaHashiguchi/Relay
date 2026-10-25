@@ -67,7 +67,7 @@ export default function Header() {
 
         <nav className={styles.navigation}>
           <Link href="/stories" className={styles.navLink}>
-            作品を探す
+            物語を探す
           </Link>
 
           {isLoggedIn === true && (

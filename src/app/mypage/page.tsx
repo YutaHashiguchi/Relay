@@ -5,41 +5,6 @@ import { createClient } from "@/lib/supabase/server";
 
 import styles from "./styles.module.css";
 
-type OwnStory = {
-  id: string;
-  title: string;
-  synopsis: string | null;
-  created_at: string;
-
-  genre: {
-    name: string;
-  } | null;
-
-  posts: {
-    id: string;
-  }[];
-};
-
-type ParticipatedStory = {
-  id: string;
-  author_id: string;
-  title: string;
-  synopsis: string | null;
-  created_at: string;
-
-  genre: {
-    name: string;
-  } | null;
-
-  author: {
-    display_name: string;
-  } | null;
-
-  posts: {
-    id: string;
-  }[];
-};
-
 export default async function MyPage() {
   const supabase = await createClient();
 
@@ -84,7 +49,7 @@ export default async function MyPage() {
       ascending: false,
     });
 
-  const ownStories = (ownStoriesData ?? []) as unknown as OwnStory[];
+  const ownStories = ownStoriesData ?? [];
 
   // 自分が投稿したPostからstory_idを取得
   const { data: myPosts } = await supabase
@@ -100,43 +65,42 @@ export default async function MyPage() {
     ...new Set((myPosts ?? []).map((post) => post.story_id)),
   ];
 
-  let participatedStories: ParticipatedStory[] = [];
+  const getParticipatedStories = async () => {
+    if (participatedStoryIds.length === 0) {
+      return [];
+    }
 
-  if (participatedStoryIds.length > 0) {
     const { data: participatedStoriesData } = await supabase
       .from("stories")
       .select(
         `
-          id,
-          author_id,
-          title,
-          synopsis,
-          created_at,
-          genre:genres (
-            name
-          ),
-          author:profiles (
-            display_name
-          ),
-          posts (
-            id
-          )
-        `,
+      id,
+      author_id,
+      title,
+      synopsis,
+      created_at,
+      genre:genres (
+        name
+      ),
+      author:profiles (
+        display_name
+      ),
+      posts (
+        id
+      )
+      `,
       )
       .in("id", participatedStoryIds)
       .order("created_at", {
         ascending: false,
       });
 
-    const typedStories = (participatedStoriesData ??
-      []) as unknown as ParticipatedStory[];
-
-    // 自分自身が作った作品は
-    // 「参加した物語」から除外
-    participatedStories = typedStories.filter(
+    return (participatedStoriesData ?? []).filter(
       (story) => story.author_id !== user.id,
     );
-  }
+  };
+
+  const participatedStories = await getParticipatedStories();
 
   return (
     <main className={styles.main}>

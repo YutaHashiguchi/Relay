@@ -176,6 +176,25 @@ export default function PostCreateForm({
         return;
       }
 
+      if (nextPosition % 5 === 0) {
+        try {
+          const summaryResponse = await fetch(
+            `/api/stories/${storyId}/summary`,
+            {
+              method: "POST",
+            },
+          );
+
+          if (!summaryResponse.ok) {
+            const summaryError = await summaryResponse.json();
+
+            console.error("Story summary generation error:", summaryError);
+          }
+        } catch (error) {
+          console.error("Story summary generation error:", error);
+        }
+      }
+
       // 投稿完了後にロック解除
       const { error: unlockError } = await supabase
         .from("story_writing_locks")

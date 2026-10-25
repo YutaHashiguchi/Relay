@@ -51,6 +51,23 @@ export default async function PostEditPage({ params }: PostEditPageProps) {
     redirect(`/stories/${storyId}`);
   }
 
+  const { data: laterPost, error: laterPostError } = await supabase
+    .from("posts")
+    .select("id")
+    .eq("story_id", storyId)
+    .gt("position", post.position)
+    .limit(1)
+    .maybeSingle();
+
+  if (laterPostError) {
+    console.error("Later post fetch error:", laterPostError);
+    redirect(`/stories/${storyId}`);
+  }
+
+  if (laterPost) {
+    redirect(`/stories/${storyId}`);
+  }
+
   return (
     <main className={styles.main}>
       <div className={styles.container}>
