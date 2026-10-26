@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 import PostDeleteButton from "./_components/PostDeleteButton";
+import StoryDeleteButton from "./_components/StoryDeleteButton";
 import StorySummary from "./_components/StorySummary";
 import type { StoryDetailPageProps } from "./type";
 
@@ -117,12 +118,16 @@ export default async function StoryDetailPage({
             </p>
 
             {isOwner && (
-              <Link
-                href={`/stories/${story.id}/edit`}
-                className={styles.editLink}
-              >
-                作品情報を編集
-              </Link>
+              <>
+                <Link
+                  href={`/stories/${story.id}/edit`}
+                  className={styles.editLink}
+                >
+                  作品情報を編集
+                </Link>
+
+                <StoryDeleteButton storyId={story.id} title={story.title} />
+              </>
             )}
 
             {story.summary && (
