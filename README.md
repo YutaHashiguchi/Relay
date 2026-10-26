@@ -1,36 +1,442 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Re:lay
 
-## Getting Started
+> **物語は、一人では終わらない。**
 
-First, run the development server:
+Re:lay は、ユーザー同士で物語を少しずつ書き継いでいく **リレー小説SNS** です。
+
+誰かが書いた物語の続きを、400文字以内の短い文章でつないでいきます。
+
+「小説を書いてみたいけれど、1人では最後まで書ききれない」  
+「長い文章を書くのはハードルが高い」
+
+そんな人でも、SNS感覚で気軽に創作へ参加できるサービスを目指して開発しました。
+
+---
+
+## デモ
+
+### デモURL
+
+https://relay-three-eta.vercel.app
+
+### デモアカウント
+
+ログイン後の以下の機能を確認できます。
+
+- 作品作成
+- 続き投稿
+- 作品情報編集
+- 最新節の本文編集
+- 最新節の削除
+- マイページ
+- 執筆ロック
+- 複数ユーザーによるリレー投稿
+
+| 表示名   | メールアドレス     | パスワード      |
+| -------- | ------------------ | --------------- |
+| テスト01 | `test01@gmail.com` | `Relaytest2026` |
+| テスト02 | `test02@gmail.com` | `Relaytest2026` |
+| テスト03 | `test03@gmail.com` | `Relaytest2026` |
+| テスト04 | `test04@gmail.com` | `Relaytest2026` |
+| テスト05 | `test05@gmail.com` | `Relaytest2026` |
+
+5つのアカウントがそれぞれ物語を作成し、他ユーザーの作品へ続きを投稿したデモデータを登録しています。
+
+---
+
+## 開発の背景
+
+学生時代、友人とLINEグループでリレー小説を書いて遊んでいた経験があり
+1人が物語を書き、その続きを別の人が自由に考えてつないでいくことで、自分では思いつかなかった展開が生まれることに面白さを感じていました。
+
+その体験をWebサービスとして再現したいと考え、Re:layを開発しました。
+
+---
+
+## 解決したい課題
+
+創作には次のようなハードルがあると考えました。
+
+- 小説を書き始めるハードルが高い
+- 長い文章を書き続けるのが難しい
+- 1人では物語を完結できず途中で挫折してしまう
+- 投稿しても反応がなく、モチベーションを維持しにくい
+
+Re:layでは、これらを以下の方法で解決します。
+
+### リレー形式
+
+1人で作品全体を書くのではなく、複数ユーザーで続きを書き継ぎます。
+
+### 1投稿400文字
+
+投稿できる本文を400文字以内に制限し、短い文章から気軽に創作へ参加できるようにしています。
+
+### 他ユーザーが続きを書く体験
+
+自分が始めた物語に、他のユーザーが予想外の続きを投稿することで、1人で書く小説とは異なる創作体験を提供します。
+
+---
+
+## 主な機能
+
+### 認証
+
+- 新規ユーザー登録
+- ログイン
+- ログアウト
+- ログイン必須ページへのアクセス制御
+
+Supabase Authを利用しています。
+
+---
+
+### 物語の作成
+
+ログインユーザーは新しい物語を作成できます。
+
+登録内容：
+
+- 作品タイトル
+- ジャンル
+- あらすじ
+- 第1節本文
+
+第1節の本文は400文字以内です。
+
+---
+
+### 作品一覧
+
+公開されている作品を一覧表示します。
+
+以下の情報を確認できます。
+
+- タイトル
+- 作者
+- ジャンル
+- あらすじ
+- 節数
+- 最新節
+
+---
+
+### 作品検索
+
+作品一覧では、
+
+- タイトル
+- あらすじ
+- 本文
+
+を対象にしたキーワード検索ができます。
+
+また、ジャンルによる絞り込みにも対応しています。
+
+---
+
+### リレー投稿
+
+既存の作品に対して、ログインユーザーが続きを投稿できます。
+
+1投稿は400文字以内です。
+
+投稿すると、
+
+`第1節 → 第2節 → 第3節...`
+
+という形で物語が続いていきます。
+
+---
+
+### 執筆ロック
+
+複数ユーザーが同時に次の一節を書いてしまうことを防ぐため、独自の執筆ロック機能を実装しています。
+
+誰かが続きを執筆している場合、他のユーザーには
+
+`現在執筆中`
+
+と表示され、同じ作品の続きを同時に投稿できません。
+
+執筆をやめた場合や投稿完了時にはロックを解除します。
+
+---
+
+### 作品情報の編集
+
+作品を作成した本人のみ、
+
+- タイトル
+- ジャンル
+- あらすじ
+
+を編集できます。
+
+画面側だけでなく、SupabaseのRLSでもアクセスを制御しています。
+
+---
+
+### 本文の編集
+
+自分が投稿した**現在の最新節のみ**本文を編集できます。
+
+自分の投稿であっても、その後に別ユーザーが続きを投稿している場合は編集できません。
+
+これは、過去の文章を書き換えることで後続の物語と矛盾することを防ぐためです。
+
+---
+
+### 本文の削除
+
+自分が投稿した**現在の最新節のみ**削除できます。
+
+削除前には確認ダイアログを表示します。
+
+過去の節は削除できません。
+
+---
+
+### AIによる物語要約
+
+OpenAI APIを利用したAI要約機能を実装しています。
+
+物語が、
+
+- 第5節
+- 第10節
+- 第15節
+- …
+
+に到達するたびに、物語の内容をAIが要約します。
+
+長く続いた作品でも、途中から参加するユーザーが内容を把握しやすくすることを目的としています。
+
+生成された要約はSupabaseに保存し、作品詳細画面に表示します。
+
+---
+
+### マイページ
+
+ログインユーザーはマイページから、
+
+- プロフィール
+- 自分が作成した物語
+- 自分が参加した物語
+
+を確認できます。
+
+---
+
+### トップページ
+
+トップページでは、
+
+- 新着作品
+- 人気作品
+- ジャンル一覧
+
+を表示しています。
+
+人気作品は投稿されている節数を基準に表示しています。
+
+---
+
+## Re:lay独自の工夫
+
+### 400文字制限
+
+長文を書く必要をなくし、SNSへ投稿するような感覚で物語へ参加できるようにしました。
+
+### 執筆ロック
+
+リレー小説では、複数ユーザーが同時に「次の一節」を投稿すると競合が発生します。
+
+そのため、作品ごとに執筆者を一時的にロックする仕組みを実装しています。
+
+### 最新節のみ編集・削除
+
+リレー小説では、過去の文章が変更されると、その文章を前提に書かれた後続のストーリーとの整合性が崩れます。
+
+そのため、編集・削除できるのは現在の最新節だけに制限しています。
+
+### AI要約
+
+節数が増えるほど途中参加のハードルが上がる問題に対して、5節ごとにAI要約を生成します。
+
+リレー小説と生成AIを組み合わせ、途中からでも作品へ参加しやすくしています。
+
+---
+
+## 画面一覧
+
+| 画面         | URL                                      | ログイン                 |
+| ------------ | ---------------------------------------- | ------------------------ |
+| トップ       | `/`                                      | 不要                     |
+| ログイン     | `/login`                                 | 不要                     |
+| 新規登録     | `/register`                              | 不要                     |
+| 作品一覧     | `/stories`                               | 不要                     |
+| 作品詳細     | `/stories/[storyId]`                     | 不要                     |
+| 新規作品作成 | `/stories/new`                           | 必要                     |
+| 作品情報編集 | `/stories/[storyId]/edit`                | 必要・作成者のみ         |
+| 続き投稿     | `/stories/[storyId]/posts/new`           | 必要                     |
+| 本文編集     | `/stories/[storyId]/posts/[postId]/edit` | 必要・最新節の投稿者のみ |
+| マイページ   | `/mypage`                                | 必要                     |
+
+---
+
+## 使用技術
+
+| 分類           | 技術                                      |
+| -------------- | ----------------------------------------- |
+| フレームワーク | Next.js 16.2.10                           |
+| UI             | React 19.2.4                              |
+| 言語           | TypeScript 5                              |
+| スタイリング   | CSS Modules                               |
+| 認証           | Supabase Auth                             |
+| データベース   | Supabase / PostgreSQL                     |
+| Supabase SDK   | `@supabase/ssr` / `@supabase/supabase-js` |
+| AI             | OpenAI Responses API                      |
+| AI SDK         | OpenAI Node.js SDK                        |
+| Lint           | ESLint 9                                  |
+| ホスティング   | Vercel                                    |
+| バージョン管理 | Git / GitHub                              |
+
+---
+
+## 外部API・サービス
+
+### Supabase Auth
+
+以下に使用しています。
+
+- ユーザー登録
+- ログイン
+- ログアウト
+- セッション管理
+
+### Supabase Database
+
+以下のデータを管理しています。
+
+- ユーザー
+- 作品
+- 投稿
+- ジャンル
+- 執筆ロック
+- AI要約
+
+Row Level Security（RLS）を利用して、ユーザーごとの更新・削除権限も制御しています。
+
+### OpenAI API
+
+物語が5節進むごとに、それまでの内容を要約するために使用しています。
+
+OpenAI APIはNext.jsのRoute Handlerからサーバー側で呼び出し、APIキーをブラウザへ公開しない構成にしています。
+
+---
+
+## データベース
+
+基本設計として以下のテーブルを使用しています。
+
+- `users`
+- `stories`
+- `posts`
+- `genres`
+- `story_genres`
+- `story_likes`
+- `bookmarks`
+- `comments`
+- `notifications`
+- `reports`
+
+また、Re:lay独自機能として以下の補助テーブルを使用しています。
+
+- `story_writing_locks`
+- `story_summaries`
+
+DB定義・RLS・RPCは `supabase/migrations` で管理しています。
+
+Supabase CLIから生成したDatabase型をTypeScriptでも使用しています。
+
+---
+
+## 環境変数
+
+ローカル環境では `.env.local` に以下を設定します。
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+OPENAI_API_KEY=
+```
+
+APIキーや認証情報はGit管理対象外です。
+
+---
+
+## ローカル環境構築
+
+リポジトリをcloneします。
+
+```bash
+git clone https://github.com/YutaHashiguchi/Relay.git
+cd Relay
+```
+
+依存パッケージをインストールします。
+
+```bash
+npm install
+```
+
+開発サーバーを起動します。
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+ブラウザで以下へアクセスします。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## 品質確認
 
-To learn more about Next.js, take a look at the following resources:
+以下のコマンドで型チェック・Lint・Production Buildを確認しています。
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npx tsc --noEmit
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint
+```
 
-## Deploy on Vercel
+```bash
+npm run build
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 今後追加したい機能
+
+現在のDB設計では将来的な拡張も想定しています。
+
+- いいね
+- ブックマーク
+- コメント
+- 通知
+- 通報
+- 管理者機能
+- フォロー
+- DM
+- AIによる執筆支援
+- AIによるイラスト生成
+- 作品の冊子化
+
+---
