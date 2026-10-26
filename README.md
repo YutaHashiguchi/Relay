@@ -199,7 +199,7 @@ Supabase Authを利用しています。
 
 ### AIによる物語要約
 
-OpenAI APIを利用したAI要約機能を実装しています。
+Gemini APIを利用したAI要約機能を実装しています。
 
 物語が、
 
@@ -296,8 +296,8 @@ OpenAI APIを利用したAI要約機能を実装しています。
 | 認証           | Supabase Auth                             |
 | データベース   | Supabase / PostgreSQL                     |
 | Supabase SDK   | `@supabase/ssr` / `@supabase/supabase-js` |
-| AI             | OpenAI Responses API                      |
-| AI SDK         | OpenAI Node.js SDK                        |
+| AI             | Gemini API / Gemini 3.8 Flash             |
+| AI SDK         | Google GenAI SDK (`@google/genai`)        |
 | Lint           | ESLint 9                                  |
 | ホスティング   | Vercel                                    |
 | バージョン管理 | Git / GitHub                              |
@@ -328,11 +328,11 @@ OpenAI APIを利用したAI要約機能を実装しています。
 
 Row Level Security（RLS）を利用して、ユーザーごとの更新・削除権限も制御しています。
 
-### OpenAI API
+### Gemini API
 
 物語が5節進むごとに、それまでの内容を要約するために使用しています。
 
-OpenAI APIはNext.jsのRoute Handlerからサーバー側で呼び出し、APIキーをブラウザへ公開しない構成にしています。
+Gemini APIはNext.jsのRoute Handlerからサーバー側で呼び出し、APIキーをブラウザへ公開しない構成にしています。
 
 ---
 
@@ -369,7 +369,7 @@ Supabase CLIから生成したDatabase型をTypeScriptでも使用していま�
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-OPENAI_API_KEY=
+GEMINI_API_KEY=
 ```
 
 APIキーや認証情報はGit管理対象外です。
