@@ -1,4 +1,4 @@
-import OpenAI from "openai";
+import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
@@ -182,10 +182,10 @@ export async function POST(_request: Request, { params }: RouteContext) {
     })
     .join("\n\n");
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    console.error("OPENAI_API_KEY is not configured.");
+    console.error("GEMINI_API_KEY is not configured.");
 
     return NextResponse.json(
       {
@@ -197,7 +197,7 @@ export async function POST(_request: Request, { params }: RouteContext) {
     );
   }
 
-  const openai = new OpenAI({
+  const gemini = new GoogleGenAI({
     apiKey,
   });
 
@@ -209,10 +209,21 @@ ${existingSummary.summary}
       `.trim()
       : "これまでの要約はありません。";
 
-    const response = await openai.responses.create({
-      model: "gpt-6-luna",
+    const response = await gemini.models.generateContent({
+      model: "gemini-3.8-flash",
 
-      instructions: `
+      contents: `
+作品タイトル：
+${story.title}
+
+${previousSummaryText}
+
+今回追加された本文：
+${newStoryText}
+  `.trim(),
+
+      config: {
+        systemInstruction: `
 あなたはリレー小説の編集者です。
 
 以下のルールを必ず守ってください。
@@ -225,23 +236,13 @@ ${existingSummary.summary}
 ・感想や考察を書かない
 ・ネタバレを避けない
 ・300文字以内の日本語でまとめる
-      `.trim(),
+    `.trim(),
 
-      input: `
-作品タイトル：
-${story.title}
-
-${previousSummaryText}
-
-今回追加された本文：
-${newStoryText}
-      `.trim(),
-
-      max_output_tokens: 400,
-      store: false,
+        maxOutputTokens: 600,
+      },
     });
 
-    const summary = response.output_text.trim();
+    const summary = response.text?.trim() ?? "";
 
     if (!summary) {
       return NextResponse.json(
@@ -287,7 +288,7 @@ ${newStoryText}
       summarizedUntilPosition: latestPosition,
     });
   } catch (error) {
-    console.error("OpenAI summary error:", error);
+    console.error("Gemini summary error:", error);
 
     return NextResponse.json(
       {
