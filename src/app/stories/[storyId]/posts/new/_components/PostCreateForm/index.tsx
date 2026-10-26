@@ -173,22 +173,12 @@ export default function PostCreateForm({
       }
 
       if (nextPosition % 5 === 0) {
-        try {
-          const summaryResponse = await fetch(
-            `/api/stories/${storyId}/summary`,
-            {
-              method: "POST",
-            },
-          );
-
-          if (!summaryResponse.ok) {
-            const summaryError = await summaryResponse.json();
-
-            console.error("Story summary generation error:", summaryError);
-          }
-        } catch (error) {
+        void fetch(`/api/stories/${storyId}/summary`, {
+          method: "POST",
+          keepalive: true,
+        }).catch((error) => {
           console.error("Story summary generation error:", error);
-        }
+        });
       }
 
       // 投稿完了後にロック解除
