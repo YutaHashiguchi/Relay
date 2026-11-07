@@ -167,7 +167,6 @@ export default async function StoryDetailPage({
 
                           <PostDeleteButton
                             postId={post.id}
-                            storyId={story.id}
                             position={post.sequence_no}
                           />
                         </>

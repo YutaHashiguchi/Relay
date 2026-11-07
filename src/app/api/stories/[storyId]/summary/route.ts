@@ -2,6 +2,7 @@ import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 import type { RouteContext, StoryPost } from "./type";
 
@@ -256,7 +257,9 @@ ${newStoryText}
     }
 
     // 作品ごとに1件の要約を保存・更新
-    const { error: upsertError } = await supabase
+    const supabaseAdmin = createAdminClient();
+
+    const { error: upsertError } = await supabaseAdmin
       .from("story_summaries")
       .upsert(
         {
