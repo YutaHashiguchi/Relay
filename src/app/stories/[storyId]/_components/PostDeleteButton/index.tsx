@@ -10,7 +10,6 @@ import styles from "./styles.module.css";
 
 export default function PostDeleteButton({
   postId,
-  storyId,
   position,
 }: PostDeleteButtonProps) {
   const router = useRouter();
@@ -39,18 +38,6 @@ export default function PostDeleteButton({
         console.error("Post delete error:", error);
         setErrorMessage("本文の削除に失敗しました。");
         return;
-      }
-
-      // 5節単位の要約と整合性が取れなくなるため、
-      // 削除した節まで要約済みの場合は要約を削除する
-      const { error: summaryDeleteError } = await supabase
-        .from("story_summaries")
-        .delete()
-        .eq("story_id", storyId)
-        .gte("summarized_until_position", position);
-
-      if (summaryDeleteError) {
-        console.error("Story summary delete error:", summaryDeleteError);
       }
 
       router.refresh();
