@@ -20,18 +20,11 @@ export default function Textarea({
   return (
     <div className={styles.wrapper}>
       <div className={styles.labelArea}>
-        <label
-          htmlFor={id}
-          className={styles.label}
-        >
+        <label htmlFor={id} className={styles.label}>
           {label}
         </label>
 
-        {helperText && (
-          <span className={styles.helperText}>
-            {helperText}
-          </span>
-        )}
+        {helperText && <span className={styles.helperText}>{helperText}</span>}
       </div>
 
       <textarea
@@ -39,17 +32,11 @@ export default function Textarea({
         {...textareaProps}
         className={textareaClassName}
         aria-invalid={Boolean(error)}
-        aria-describedby={
-          error ? `${id}-error` : undefined
-        }
+        aria-describedby={error ? `${id}-error` : undefined}
       />
 
       {error && (
-        <p
-          id={`${id}-error`}
-          role="alert"
-          className={styles.errorMessage}
-        >
+        <p id={`${id}-error`} role="alert" className={styles.errorMessage}>
           {error}
         </p>
       )}

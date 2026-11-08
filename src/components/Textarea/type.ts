@@ -5,7 +5,4 @@ export type TextareaProps = {
   label: string;
   helperText?: string;
   error?: string;
-} & Omit<
-  TextareaHTMLAttributes<HTMLTextAreaElement>,
-  "id"
->;
+} & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "id">;

@@ -20,10 +20,7 @@ export default function SelectBox({
 
   return (
     <div className={styles.wrapper}>
-      <label
-        htmlFor={id}
-        className={styles.label}
-      >
+      <label htmlFor={id} className={styles.label}>
         {label}
       </label>
 
@@ -33,19 +30,12 @@ export default function SelectBox({
           {...selectProps}
           className={selectClassName}
           aria-invalid={Boolean(error)}
-          aria-describedby={
-            error ? `${id}-error` : undefined
-          }
+          aria-describedby={error ? `${id}-error` : undefined}
         >
-          <option value="">
-            {placeholder}
-          </option>
+          <option value="">{placeholder}</option>
 
           {options.map((option) => (
-            <option
-              key={option.value}
-              value={option.value}
-            >
+            <option key={option.value} value={option.value}>
               {option.label}
             </option>
           ))}
@@ -53,11 +43,7 @@ export default function SelectBox({
       </div>
 
       {error && (
-        <p
-          id={`${id}-error`}
-          role="alert"
-          className={styles.errorMessage}
-        >
+        <p id={`${id}-error`} role="alert" className={styles.errorMessage}>
           {error}
         </p>
       )}
