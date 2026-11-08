@@ -119,43 +119,20 @@ export default function StoryCreateForm() {
       }
 
       // 最初のPostを登録
-      const { data: post, error: postError } = await supabase
-        .from("posts")
-        .insert({
-          story_id: story.id,
-          user_id: user.id,
-          body: trimmedBody,
-          sequence_no: 1,
-        })
-        .select("id, created_at")
-        .single();
+      const { error: postError } = await supabase.from("posts").insert({
+        story_id: story.id,
+        user_id: user.id,
+        body: trimmedBody,
+        sequence_no: 1,
+      });
 
-      if (postError || !post) {
+      if (postError) {
         console.error(postError);
 
         // stories削除時にstory_genresもCASCADEで削除される
         await supabase.from("stories").delete().eq("id", story.id);
 
         setErrorMessage("本文の投稿に失敗しました。");
-        return;
-      }
-
-      // 作品の集計情報を更新
-      const { error: storyUpdateError } = await supabase
-        .from("stories")
-        .update({
-          latest_post_id: post.id,
-          posts_count: 1,
-          last_posted_at: post.created_at,
-        })
-        .eq("id", story.id);
-
-      if (storyUpdateError) {
-        console.error(storyUpdateError);
-
-        await supabase.from("stories").delete().eq("id", story.id);
-
-        setErrorMessage("作品情報の更新に失敗しました。");
         return;
       }
 

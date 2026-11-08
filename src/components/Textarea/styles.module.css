@@ -12,10 +12,7 @@
 
 .label {
   color: #493a2f;
-  font-family:
-    "Yu Mincho",
-    "Hiragino Mincho ProN",
-    serif;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
   font-size: 14px;
   font-weight: 600;
 }
@@ -30,10 +27,7 @@
   min-height: 120px;
   padding: 14px 16px;
   color: #342b24;
-  font-family:
-    "Yu Mincho",
-    "Hiragino Mincho ProN",
-    serif;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
   font-size: 15px;
   line-height: 1.9;
   resize: vertical;
