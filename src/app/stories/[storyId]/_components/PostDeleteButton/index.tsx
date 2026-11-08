@@ -10,7 +10,6 @@ import styles from "./styles.module.css";
 
 export default function PostDeleteButton({
   postId,
-  storyId,
   position,
 }: PostDeleteButtonProps) {
   const router = useRouter();
