@@ -237,9 +237,21 @@ ${newStoryText}
 ・感想や考察を書かない
 ・ネタバレを避けない
 ・300文字以内の日本語でまとめる
-    `.trim(),
+  `.trim(),
 
         maxOutputTokens: 600,
+
+        httpOptions: {
+          timeout: 20_000,
+          retryOptions: {
+            attempts: 3,
+            initialDelay: 1,
+            maxDelay: 5,
+            expBase: 2,
+            jitter: 1,
+            httpStatusCodes: [408, 429, 500, 502, 503, 504],
+          },
+        },
       },
     });
 
