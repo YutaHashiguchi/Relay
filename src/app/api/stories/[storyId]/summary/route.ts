@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, ThinkingLevel } from "@google/genai";
 import { NextResponse } from "next/server";
 
 import { createClient } from "@/lib/supabase/server";
@@ -211,7 +211,7 @@ ${existingSummary.summary}
       : "これまでの要約はありません。";
 
     const response = await gemini.models.generateContent({
-      model: "gemini-3.8-flash",
+      model: "gemini-3.6-flash",
 
       contents: `
 作品タイトル：
@@ -239,14 +239,18 @@ ${newStoryText}
 ・300文字以内の日本語でまとめる
   `.trim(),
 
+        thinkingConfig: {
+          thinkingLevel: ThinkingLevel.LOW,
+        },
+
         maxOutputTokens: 600,
 
         httpOptions: {
-          timeout: 20_000,
+          timeout: 60_000,
           retryOptions: {
-            attempts: 3,
+            attempts: 2,
             initialDelay: 1,
-            maxDelay: 5,
+            maxDelay: 3,
             expBase: 2,
             jitter: 1,
             httpStatusCodes: [408, 429, 500, 502, 503, 504],
